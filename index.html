@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Manutenção</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        #data-hora {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 40px; /* Aumentando o espaço entre a hora e os botões */
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .prev, .next {
+            flex-grow: 1;
+            text-align: center;
+            max-width: 150px;
+        }
+        .menu-button {
+            flex-grow: 2;
+            text-align: center;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CONTROLE DE MANUTENÇÃO</h1>
+    <div id="data-hora"></div>
+
+    <div class="container">
+        <button onclick="window.location.href='cadastro-equipamentos.html'">Equipamentos</button>
+        <button onclick="window.location.href='controle-os.html'">Ordem de Serviço</button>
+        <button onclick="window.location.href='relatorios.html'">Relatório</button>
+        <button onclick="window.location.href='exibir equip.html'">Ver Dados Armazenados</button>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='pagina-anterior.html'">Fechar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='cadastro-equipamentos.html'">Avançar</button>
+    </div>
+
+    <script>
+        function atualizarDataHora() {
+            const dataHora = new Date();
+            const dataFormatada = dataHora.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const horaFormatada = dataHora.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('data-hora').textContent = `${dataFormatada} ${horaFormatada}`;
+        }
+
+        // Atualiza a data e hora ao carregar a página
+        window.onload = atualizarDataHora;
+    </script>
+
+</body>
+</html>

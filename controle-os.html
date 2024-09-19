@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Ordem de Serviço</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 80px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .os-number {
+            font-weight: bold;
+            font-size: 18px;
+            background-color: #f3f3f3;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            display: block;
+            width: fit-content;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .prev, .next {
+            flex-grow: 1;
+            text-align: center;
+            max-width: 150px;
+        }
+        .menu-button {
+            flex-grow: 2;
+            text-align: center;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .scrollable {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .os-actions button {
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .os-actions button.edit {
+            background-color: #007BFF; /* Cor azul para o botão de editar */
+            color: white;
+        }
+        .os-actions button.delete {
+            background-color: #FF0000; /* Cor vermelha para o botão de excluir */
+            color: white;
+        }
+              /* Layout flexível para os campos lado a lado */
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .form-row div {
+            flex: 1;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Controle de Ordem de Serviço</h2>
+        <form id="osForm">
+            <label for="os_numero">Número da OS</label>
+            <span id="os_numero" class="os-number"></span> <!-- Exibição do número da OS -->
+
+              <div class="form-row">
+                <div>
+                    <label for="data_inicial">Data Inicial</label>
+                    <input type="date" id="data_inicial" name="data_inicial" required>
+                </div>
+                <div>
+                    <label for="data_conclusao">Data de Conclusão</label>
+                    <input type="date" id="data_conclusao" name="data_conclusao" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="cliente">Cliente</label>
+                    <input type="text" id="cliente" name="cliente" required>
+                </div>
+                <div>
+                    <label for="equipamento">Equipamento</label>
+                    <input type="text" id="equipamento" name="equipamento" required>
+                </div>
+            </div>
+
+            <label for="tipo_servico">Tipo de Serviço</label>
+            <select id="tipo_servico" name="tipo_servico" required>
+                <option value="Preventiva">Preventiva</option>
+                <option value="Corretiva">Corretiva</option>
+            </select>
+
+            <label for="descricao_problema">Descrição do Problema</label>
+            <textarea id="descricao_problema" name="descricao_problema" rows="4" required></textarea>
+
+            <label for="metodo_correcao">Método de Correção</label>
+            <textarea id="metodo_correcao" name="metodo_correcao" rows="4" required></textarea>
+
+            <label for="pendencias">Pendências</label>
+            <select id="pendencias" name="pendencias" required>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+            </select>
+
+            <button type="submit">Cadastrar Ordem de Serviço</button>
+        </form>
+
+        <div class="scrollable">
+            <ul id="osList"></ul>
+        </div>
+    </div>
+  <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='cadastro-equipamentos.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='relatorios.html'">Avançar</button>
+    </div>
+
+    <script>
+        const osForm = document.getElementById('osForm');
+        const osList = document.getElementById('osList');
+        const osNumeroDisplay = document.getElementById('os_numero');
+        let ordens = JSON.parse(localStorage.getItem('ordens')) || [];
+        let nextOSNumber = ordens.length > 0 ? Math.max(...ordens.map(o => parseInt(o.os_numero))) + 1 : 1;
+        let editIndex = null; // Para rastrear se estamos editando uma OS
+
+        // Função para gerar o número da OS com 4 dígitos
+        function generateOSNumber() {
+            return String(nextOSNumber).padStart(4, '0');
+        }
+
+        // Exibir o número da OS ao carregar a página
+        osNumeroDisplay.textContent = generateOSNumber();
+
+        // Função para salvar a ordem de serviço
+        function saveOrdem(e) {
+            e.preventDefault();
+
+            const ordem = {
+                os_numero: editIndex !== null ? ordens[editIndex].os_numero : generateOSNumber(),
+                data_inicial: document.getElementById('data_inicial').value,
+                data_conclusao: document.getElementById('data_conclusao').value,
+                tipo_servico: document.getElementById('tipo_servico').value,
+                equipamento: document.getElementById('equipamento').value,
+                cliente: document.getElementById('cliente').value,
+                descricao_problema: document.getElementById('descricao_problema').value,
+                metodo_correcao: document.getElementById('metodo_correcao').value,
+                pendencias: document.getElementById('pendencias').value
+            };
+
+            if (editIndex !== null) {
+                // Atualizar a ordem existente
+                ordens[editIndex] = ordem;
+                editIndex = null; // Resetar o modo de edição
+            } else {
+                // Adicionar nova ordem
+                ordens.push(ordem);
+                nextOSNumber++;
+            }
+
+            localStorage.setItem('ordens', JSON.stringify(ordens));
+
+            // Atualiza a lista de OS e o número da próxima ordem
+            renderOrdens();
+            osNumeroDisplay.textContent = generateOSNumber();
+            osForm.reset();
+        }
+
+        // Função para renderizar as ordens de serviço cadastradas na página
+        function renderOrdens() {
+            osList.innerHTML = '';
+            ordens.forEach((ordem, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    OS: ${ordem.os_numero} - Cliente: ${ordem.cliente} - Equipamento: ${ordem.equipamento}
+                    <div class="os-actions">
+                        <button class="edit" onclick="editOrdem(${index})">Editar</button>
+                        <button class="delete" onclick="deleteOrdem(${index})">Excluir</button>
+                    </div>
+                `;
+                osList.appendChild(li);
+            });
+        }
+
+        // Função para editar uma ordem de serviço
+        function editOrdem(index) {
+            const ordem = ordens[index];
+            document.getElementById('data_inicial').value = ordem.data_inicial;
+            document.getElementById('data_conclusao').value = ordem.data_conclusao;
+            document.getElementById('tipo_servico').value = ordem.tipo_servico;
+            document.getElementById('equipamento').value = ordem.equipamento;
+            document.getElementById('cliente').value = ordem.cliente;
+            document.getElementById('descricao_problema').value = ordem.descricao_problema;
+            document.getElementById('metodo_correcao').value = ordem.metodo_correcao;
+            document.getElementById('pendencias').value = ordem.pendencias;
+
+            // Atualizar o número da OS na interface
+            osNumeroDisplay.textContent = ordem.os_numero;
+
+            editIndex = index;
+        }
+
+        // Função para excluir uma ordem de serviço
+        function deleteOrdem(index) {
+            ordens.splice(index, 1);
+            localStorage.setItem('ordens', JSON.stringify(ordens));
+            renderOrdens();
+            osNumeroDisplay.textContent = generateOSNumber();
+        }
+
+        osForm.addEventListener('submit', saveOrdem);
+
+        // Renderizar as ordens de serviço ao carregar a página
+        window.onload = renderOrdens;
+    </script>
+</body>
+</html>
