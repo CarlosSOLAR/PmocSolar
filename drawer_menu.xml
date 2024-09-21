@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_clientes"
+        android:title="Clientes"
+        android:icon="@drawable/ic_clients" />
+    <item
+        android:id="@+id/nav_equipamentos"
+        android:title="Equipamentos"
+        android:icon="@drawable/ic_equipments" />
+    <item
+        android:id="@+id/nav_servicos"
+        android:title="Serviços"
+        android:icon="@drawable/ic_services" />
+    <item
+        android:id="@+id/nav_ordens"
+        android:title="Ordens de Serviço"
+        android:icon="@drawable/ic_orders" />
+    <item
+        android:id="@+id/nav_checklist"
+        android:title="Check-list PMOC"
+        android:icon="@drawable/ic_checklist" />
+    <item
+        android:id="@+id/nav_agendamentos"
+        android:title="Agendamentos"
+        android:icon="@drawable/ic_schedule" />
+    <item
+        android:id="@+id/nav_relatorios"
+        android:title="Relatórios"
+        android:icon="@drawable/ic_reports" />
+</menu>
