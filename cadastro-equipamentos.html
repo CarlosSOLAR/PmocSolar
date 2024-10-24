@@ -7,14 +7,20 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #0056b3; /* Azul */
             padding: 20px;
-            margin-bottom: 80px;
+            color: white; /* Cor do texto branco para contraste */
+        }
+        h2 {
+            text-align: center;
+            color: white; /* Cor branca para o título */
+            font-size: 24px;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
             background-color: #fff;
+            color: #0056b3;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -23,24 +29,24 @@
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
-            border: 1px solid #ccc;
+             border: 1px solid #ccc;
             border-radius: 5px;
             box-sizing: border-box;
         }
         button {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #fdd835;
+            color: #0056b3;
             cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #fbc02d;
         }
         .action-btn {
             display: inline-block;
             padding: 5px 10px;
             margin-right: 5px;
             background-color: #ff7043;
-            color: white;
+            color: #0056b3;
             border: none;
             cursor: pointer;
             border-radius: 5px;
@@ -60,13 +66,19 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background-color: #fff;
+            background-color: #0056b3;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
         .bottom-nav button {
-            padding: 15px;
+            padding: 5px;
             font-size: 16px;
             border-radius: 5px;
+            background-color: #fdd835; /* Fundo amarelo */
+            color: #0056b3; /* Texto azul escuro */
+            border: none;
+            cursor: pointer;
+            max-width: 150px; /* Ajuste na largura dos botões */
+            margin: 0 15px; /* Espaçamento horizontal entre os botões */
         }
         .prev, .next {
             flex-grow: 1;
@@ -82,6 +94,7 @@
             max-width: 200px;
             margin: 0 auto;
         }
+        
         .scrollable {
             max-height: 200px;
             overflow-y: auto;
@@ -102,11 +115,15 @@
             padding: 8px;
             text-align: left;
         }
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <h2>CADASTRO DE EQUIPAMENTOS</h2>
     <div class="container">
-        <h2>Cadastro de Equipamentos</h2>
         <form id="equipamentoForm">
             <label for="nome_equipamento">Nome do Equipamento</label>
             <input type="text" id="nome_equipamento" name="nome_equipamento" required>
@@ -121,7 +138,9 @@
             <input type="text" id="numero_serie" name="numero_serie" required>
 
             <label for="cliente">Cliente</label>
-            <input type="text" id="cliente" name="cliente" required>
+            <select id="cliente" name="cliente" required>
+                <!-- Clientes cadastrados serão carregados aqui -->
+            </select>
 
             <label for="local_instalacao">Local de Instalação</label>
             <input type="text" id="local_instalacao" name="local_instalacao" required>
@@ -146,15 +165,15 @@
             </table>
         </div>
     </div>
-
-    <div class="bottom-nav">
-        <button class="prev" onclick="window.location.href='index.html'">Voltar</button>
+    
+ <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='cadastrar-serviços.html'">Voltar</button>
         <div class="menu-button">
             <button onclick="window.location.href='index.html'">MENU</button>
         </div>
-        <button class="next" onclick="window.location.href='controle-os.html'">Avançar</button>
+        <button class="next" onclick="window.location.href='plano-manutenção.html'">Avançar</button>
     </div>
-
+    
     <script>
         const equipamentoForm = document.getElementById('equipamentoForm');
         const equipamentoList = document.querySelector('#equipamentoList tbody');
@@ -222,14 +241,29 @@
 
         // Função para apagar um equipamento
         function deleteEquipamento(index) {
-            equipamentos.splice(index, 1);
-            localStorage.setItem('equipamentos', JSON.stringify(equipamentos));
-            renderEquipamentos();
+            if (confirm('Tem certeza que deseja apagar este equipamento?')) {
+                equipamentos.splice(index, 1);
+                localStorage.setItem('equipamentos', JSON.stringify(equipamentos));
+                renderEquipamentos();
+            }
         }
 
-        // Renderizar os equipamentos ao carregar a página
-        window.onload = renderEquipamentos;
-    </script>
+        // Função para carregar os clientes do localStorage e preencher o select
+        function carregarClientes() {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            const clienteSelect = document.getElementById('cliente');
 
+            clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clientes.forEach(cliente => {
+                clienteSelect.innerHTML += `<option value="${cliente.nome_cliente}">${cliente.nome_cliente}</option>`;
+            });
+        }
+
+        // Chamada para carregar clientes e renderizar equipamentos ao carregar a página
+        window.onload = () => {
+            carregarClientes();
+            renderEquipamentos();
+        };
+    </script>
 </body>
 </html>
