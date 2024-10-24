@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Ordem de Serviço</title>
+    <title>Ordem de Serviço</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #0056b3; /* Azul */
             padding: 20px;
-            margin-bottom: 80px;
+            color: white; /* Cor do texto branco para contraste */
+        }
+        h2 {
+            text-align: center;
+            color: white; /* Cor branca para o título */
+            font-size: 24px;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
+           background-color: #fff;
+            color: #0056b3;
             padding: 20px;
+           color: #0056b3; /* Cor do texto branco para contraste */
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
@@ -28,18 +35,19 @@
             box-sizing: border-box;
         }
         button {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #fdd835;
+            color: #0056b3;
             cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #fbc02d;
         }
         .os-number {
             font-weight: bold;
             font-size: 18px;
             background-color: #f3f3f3;
             padding: 10px;
+           color: #0056b3; /* Cor do texto branco para contraste */
             border-radius: 5px;
             border: 1px solid #ccc;
             margin-bottom: 20px;
@@ -55,13 +63,19 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background-color: #fff;
+            background-color: #0056b3;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
         .bottom-nav button {
-            padding: 15px;
+            padding: 5px;
             font-size: 16px;
             border-radius: 5px;
+            background-color: #fdd835; /* Fundo amarelo */
+            color: #0056b3; /* Texto azul escuro */
+            border: none;
+            cursor: pointer;
+            max-width: 150px; /* Ajuste na largura dos botões */
+            margin: 0 15px; /* Espaçamento horizontal entre os botões */
         }
         .prev, .next {
             flex-grow: 1;
@@ -97,6 +111,10 @@
             padding: 8px;
             text-align: left;
         }
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
         .os-actions button {
             margin-right: 10px;
             margin-top: 10px;
@@ -118,14 +136,13 @@
         .form-row div {
             flex: 1;
         }
-        
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Controle de Ordem de Serviço</h2>
+        <h2>ORDEM DE SERVIÇO</h2>
         <form id="osForm">
-            <label for="os_numero">Número da OS</label>
+    <div class="container">
+            <label for="os_numero">N° da OS</label>
             <span id="os_numero" class="os-number"></span> <!-- Exibição do número da OS -->
 
               <div class="form-row">
@@ -176,11 +193,11 @@
         </div>
     </div>
   <div class="bottom-nav">
-        <button class="prev" onclick="window.location.href='cadastro-equipamentos.html'">Voltar</button>
+        <button class="prev" onclick="window.location.href='plano-manutenção.html'">Voltar</button>
         <div class="menu-button">
             <button onclick="window.location.href='index.html'">MENU</button>
         </div>
-        <button class="next" onclick="window.location.href='relatorios.html'">Avançar</button>
+        <button class="next" onclick="window.location.href='checklist.html'">Avançar</button>
     </div>
 
     <script>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHECKLISTS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            padding: 20px;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+              border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #fdd835;
+            color: #0056b3;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #fbc02d;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+         th {
+           background-color: #0056b3;
+            color: white;
+         }
+        .checklist {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .checklist label {
+            margin-right: 10px;
+        }
+        .status-options {
+            display: flex;
+            justify-content: space-around;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3; /* Mesma cor de fundo azul */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835; /* Fundo amarelo */
+            color: #0056b3; /* Texto azul escuro */
+            border: none;
+            cursor: pointer;
+            width: 150px; /* Ajuste na largura dos botões */
+            margin: 0 15px; /* Espaçamento horizontal entre os botões */
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d; /* Amarelo mais escuro no hover */
+        }
+        .prev, .next {
+            text-align: center;
+        }
+        .menu-button {
+            text-align: center;
+            flex-grow: 2;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>CHECKLISTS</h2>
+    <div class="container">
+        <form id="checklistForm">
+            <!-- Data de Preenchimento -->
+            <label for="data_preenchimento">Data de Preenchimento</label>
+            <input type="text" id="data_preenchimento" name="data_preenchimento" readonly>
+
+            <!-- Cliente vem antes do Equipamento agora -->
+            <label for="cliente">Cliente</label>
+            <select id="cliente" name="cliente" required>
+                <!-- Clientes cadastrados serão carregados aqui -->
+            </select>
+
+            <label for="equipamento">Equipamento</label>
+            <select id="equipamento" name="equipamento" required>
+                <!-- Equipamentos cadastrados serão carregados aqui -->
+            </select>
+
+            <div id="servicosChecklist" class="scrollable">
+                <!-- Serviços e opções do checklist serão gerados aqui -->
+            </div>
+            <label for="observacoes">Observações</label>
+            <textarea id="observacoes" name="observacoes" required></textarea>
+
+            <button type="submit">Salvar Checklist</button>
+        </form>
+    
+
+    <div class="scrollable">
+        <table id="checklistList">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Equipamento</th>
+                    <th>Serviço</th>
+                    <th>Status</th>
+                    <th>Frequência</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='controle-os.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='orçamento.html'">Avançar</button>
+    </div>
+    <script>
+        const checklistForm = document.getElementById('checklistForm');
+        const servicosChecklist = document.getElementById('servicosChecklist');
+        const dataPreenchimento = document.getElementById('data_preenchimento');
+        const checklistList = document.querySelector('#checklistList tbody');
+        let checklists = JSON.parse(localStorage.getItem('checklists')) || [];
+        let editIndex = null;
+
+        // Função para gerar a data de preenchimento
+        function gerarDataPreenchimento() {
+            const hoje = new Date();
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0'); // Meses começam do 0
+            const ano = hoje.getFullYear();
+            dataPreenchimento.value = `${dia}/${mes}/${ano}`; // Formato DD/MM/AAAA
+        }
+
+        // Função para carregar os serviços de manutenção com frequências e gerar o checklist
+        function gerarChecklist() {
+            servicosChecklist.innerHTML = ''; // Limpa os serviços anteriores
+            const servicos = JSON.parse(localStorage.getItem('servicos')) || [];
+
+            // Percorre os serviços cadastrados no localStorage
+            servicos.forEach(servico => {
+                servicosChecklist.innerHTML += `
+                    <div class="checklist">
+                        <label for="servico_${servico.nome_servico}">
+                            ${servico.nome_servico} (Frequência: ${servico.frequencia})
+                        </label>
+                        <div class="status-options">
+                            <label>C <input type="radio" name="servico_${servico.nome_servico}" value="C" required></label>
+                            <label>NC <input type="radio" name="servico_${servico.nome_servico}" value="NC"></label>
+                            <label>NA <input type="radio" name="servico_${servico.nome_servico}" value="NA"></label>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Função para salvar o checklist no localStorage
+        checklistForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const checklistData = {
+                data_preenchimento: dataPreenchimento.value,
+                equipamento: document.getElementById('equipamento').value,
+                cliente: document.getElementById('cliente').value,
+                observacoes: document.getElementById('observacoes').value,
+                servicos: []
+            };
+
+            // Percorre os serviços para salvar o status de cada um no checklist
+            const servicos = JSON.parse(localStorage.getItem('servicos')) || [];
+            servicos.forEach(servico => {
+                const status = document.querySelector(`input[name="servico_${servico.nome_servico}"]:checked`).value;
+                // Verifica se o status está definido antes de adicionar ao checklist
+                if (status) {
+                    checklistData.servicos.push({ nome_servico: servico.nome_servico, status, frequencia: servico.frequencia });
+                }
+            });
+
+
+// Agrupa os checklists por cliente e equipamento
+            const existingChecklistIndex = checklists.findIndex(checklist => 
+                checklist.cliente === checklistData.cliente && 
+                checklist.equipamento === checklistData.equipamento && 
+                checklist.data_preenchimento === checklistData.data_preenchimento
+            );
+
+            if (existingChecklistIndex !== -1) {
+                // Se já existir um checklist para esse cliente e equipamento na mesma data, atualiza o checklist existente
+                checklists[existingChecklistIndex].servicos = checklistData.servicos;
+                checklists[existingChecklistIndex].observacoes = checklistData.observacoes;
+            } else {
+                // Se não existir, adiciona um novo checklist
+                checklists.push(checklistData);
+            }
+
+          // Salva no localStorage
+            localStorage.setItem('checklists', JSON.stringify(checklists));
+            checklistForm.reset();
+            gerarDataPreenchimento(); // Gera uma nova data para o próximo preenchimento
+            gerarChecklist(); // Recarrega o checklist para uma nova entrada
+            renderizarChecklists(); // Atualiza a tabela de checklists salvos
+        });
+
+        // Função para carregar os equipamentos e clientes do localStorage e preencher os selects
+        function carregarEquipamentosEClientes() {
+            const equipamentos = JSON.parse(localStorage.getItem('equipamentos')) || [];
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+
+            const equipamentoSelect = document.getElementById('equipamento');
+            const clienteSelect = document.getElementById('cliente');
+
+            equipamentoSelect.innerHTML = '<option value="">Selecione um equipamento</option>';
+            equipamentos.forEach(equipamento => {
+                equipamentoSelect.innerHTML += `<option value="${equipamento.nome_equipamento}">${equipamento.nome_equipamento}</option>`;
+            });
+
+            clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clientes.forEach(cliente => {
+                clienteSelect.innerHTML += `<option value="${cliente.nome_cliente}">${cliente.nome_cliente}</option>`;
+            });
+        }
+
+        // Função para renderizar os checklists salvos na tabela
+        function renderizarChecklists() {
+            checklistList.innerHTML = ''; // Limpa a tabela antes de preencher
+            checklists.forEach((checklist, index) => {
+                checklist.servicos.forEach(servico => {
+                    checklistList.innerHTML += `
+                        <tr>
+                            <td>${checklist.data_preenchimento}</td>
+                            <td>${checklist.cliente}</td>
+                            <td>${checklist.equipamento}</td>
+                            <td>${servico.nome_servico}</td>
+                            <td>${servico.status}</td>
+                            <td>${servico.frequencia}</td>
+                            <td>
+                                <button onclick="editarChecklist(${index})">Editar</button>
+                                <button onclick="deletarChecklist(${index})">Deletar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // Função para editar um checklist
+        function editarChecklist(index) {
+            editIndex = index;
+            const checklist = checklists[index];
+
+            // Preenche o formulário com os dados do checklist a ser editado
+            document.getElementById('data_preenchimento').value = checklist.data_preenchimento;
+            document.getElementById('cliente').value = checklist.cliente;
+            document.getElementById('equipamento').value = checklist.equipamento;
+            document.getElementById('observacoes').value = checklist.observacoes;
+
+            // Preenche os serviços com os status salvos
+            checklist.servicos.forEach(servico => {
+                const radioButton = document.querySelector(`input[name="servico_${servico.nome_servico}"][value="${servico.status}"]`);
+                if (radioButton) {
+                    radioButton.checked = true;
+                }
+            });
+        }
+
+        // Função para deletar um checklist
+        function deletarChecklist(index) {
+            checklists.splice(index, 1); // Remove o checklist da lista
+            localStorage.setItem('checklists', JSON.stringify(checklists)); // Atualiza o localStorage
+            renderizarChecklists(); // Re-renderiza a tabela com os checklists atualizados
+        }
+
+        // Chamada para carregar equipamentos, clientes e serviços ao carregar a página
+        window.onload = () => {
+            gerarDataPreenchimento(); // Define a data de preenchimento ao carregar
+            carregarEquipamentosEClientes();
+            gerarChecklist(); // Gera o checklist com base nos serviços
+            renderizarChecklists(); // Renderiza os checklists salvos no localStorage
+        };
+    </script>
+</body>
+</html>

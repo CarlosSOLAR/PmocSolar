@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHECKLISTS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- jsPDF -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            padding: 20px;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+               .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+border: 1px solid white;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th.servico, td.servico {
+            width: 50%;
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+        th.cliente, td.cliente {
+            width: 30%;
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+        th.checkbox, td.checkbox {
+            width: 5%;
+            text-align: center;
+        }
+        tfoot td {
+            text-align: left;
+            padding-top: 10px;
+        }
+        .select-all-checkbox {
+            cursor: pointer;
+        }
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-container label {
+            color: white;
+        }
+        .filter-container input[type="date"],
+        .filter-container select {
+            padding: 5px;
+            border: none;
+            border-radius: 4px;
+            height: 35px;
+        }
+        .filter-select {
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        #clientFilter {
+            margin-top: 5px;
+            height: 50px;
+        }
+        #generatePdfBtn {
+            position: fixed;
+            bottom: 20px; /* Aumentado para um espaçamento maior do rodapé */
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: calc(100% - 40px);
+            max-width: 600px; /* Correspondendo ao layout da ordem de serviço */
+        }
+        #generatePdfBtn:hover {
+            background-color: #fbc02d;
+        }
+    </style>
+</head>
+<body>
+    <h2>RELATÓRIOS CHECKLISTS</h2>
+ <div class="container">
+    <!-- Filtro por Cliente -->
+    <div class="filter-select">
+        <label for="clientFilter">Filtrar por Cliente:</label>
+        <select id="clientFilter">
+            <option value="">Todos os Clientes</option>
+        </select>
+    </div>
+
+    <!-- Filtros por Data -->
+    <div class="filter-container">
+        <label for="startDate">Data Início:</label>
+        <input type="date" id="startDate">
+        
+        <label for="endDate">Data Fim:</label>
+        <input type="date" id="endDate">
+    </div>
+
+        <div class="scrollable">
+            <table id="checklistList">
+                <thead>
+                    <tr>
+                        <th class="checkbox">Selecionar</th>
+                        <th>Data</th>
+                        <th class="cliente">Cliente</th>
+                        <th>Equipamento</th>
+                        <th class="servico">Serviços</th>
+                        <th>Status</th>
+                        <th>Frequência</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="8">
+                            <label>
+                                <input type="checkbox" id="selectAll" class="select-all-checkbox"> Selecionar Todos
+                            </label>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Botão para gerar o PDF -->
+        <button id="generatePdfBtn">Gerar PDF dos Checklists Selecionados</button>
+
+    </div>
+
+    <script>
+        const checklistList = document.querySelector('#checklistList tbody');
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const clientFilter = document.getElementById('clientFilter');
+        const generatePdfBtn = document.getElementById('generatePdfBtn');
+        let checklists = JSON.parse(localStorage.getItem('checklists')) || [];
+        let filteredByClient = checklists;
+        let filteredByDate = checklists;
+
+        // Função para renderizar os checklists salvos na tabela
+        function renderizarChecklists(filteredChecklists) {
+            checklistList.innerHTML = ''; // Limpa a tabela antes de preencher
+            filteredChecklists.forEach((checklist, index) => {
+                // Criando uma string que concatena todos os serviços
+                let servicosConcatenados = checklist.servicos.map(servico => {
+                    return `${servico.nome_servico}`;
+                }).join('<br>');
+
+                // Separando status e frequência em colunas diferentes
+                let statusConcatenados = checklist.servicos.map(servico => {
+                    return `${servico.status}`;
+                }).join('<br>');
+
+                let frequenciaConcatenada = checklist.servicos.map(servico => {
+                    return `${servico.frequencia}`;
+                }).join('<br>');
+
+                checklistList.innerHTML += `
+                    <tr>
+                        <td class="checkbox"><input type="checkbox" class="checklist-checkbox" id="checklist_${index}"></td>
+                        <td>${checklist.data_preenchimento}</td>
+                        <td class="cliente">${checklist.cliente}</td>
+                        <td>${checklist.equipamento}</td>
+                        <td class="servico">${servicosConcatenados}</td>
+                        <td>${statusConcatenados}</td>
+                        <td>${frequenciaConcatenada}</td>
+                        <td>${checklist.observacoes}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Função para selecionar/deselecionar todos os checklists
+        selectAllCheckbox.addEventListener('change', function() {
+            const allCheckboxes = document.querySelectorAll('.checklist-checkbox');
+            allCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        // Função para filtrar checklists por cliente
+        function filterByClient() {
+            const selectedClient = clientFilter.value;
+            filteredByClient = checklists.filter(checklist => {
+                return selectedClient === '' || checklist.cliente === selectedClient;
+            });
+            renderizarChecklists(filteredByClient.filter(checklist => filteredByDate.includes(checklist)));
+        }
+
+        // Função para filtrar checklists por data
+        function filterByDate() {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+
+            filteredByDate = checklists.filter(checklist => {
+                const checklistDate = new Date(checklist.data_preenchimento);
+                const isWithinDateRange = (!startDateInput.value || checklistDate >= startDate) &&
+                                          (!endDateInput.value || checklistDate <= endDate);
+                return isWithinDateRange;
+            });
+            renderizarChecklists(filteredByDate.filter(checklist => filteredByClient.includes(checklist)));
+        }
+
+        // Adiciona eventos de input para filtrar automaticamente
+        startDateInput.addEventListener('input', filterByDate);
+        endDateInput.addEventListener('input', filterByDate);
+        clientFilter.addEventListener('change', filterByClient);
+
+        // Função para preencher o campo de seleção de clientes
+        function populateClientFilter() {
+            const clients = [...new Set(checklists.map(checklist => checklist.cliente))]; // Pega clientes únicos
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client;
+                option.textContent = client;
+                clientFilter.appendChild(option);
+            });
+        }
+
+        // Função para gerar PDF dos checklists selecionados
+        function generatePdf() {
+            const selectedCheckboxes = document.querySelectorAll('.checklist-checkbox:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert('Nenhum checklist selecionado.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let yPosition = 10; // Posição vertical inicial no PDF
+
+            selectedCheckboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                const data = row.cells[1].textContent;
+                const cliente = row.cells[2].textContent;
+                const equipamento = row.cells[3].textContent;
+                const servicos = row.cells[4].innerHTML.replace(/<br>/g, ', '); // Substitui <br> por vírgula
+                const status = row.cells[5].innerHTML.replace(/<br>/g, ', ');
+                const frequencia = row.cells[6].innerHTML.replace(/<br>/g, ', ');
+                const observacoes = row.cells[7].textContent;
+
+                // Adicionando as informações no PDF
+                doc.text(`Data: ${data}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Cliente: ${cliente}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Equipamento: ${equipamento}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Serviços: ${servicos}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Status: ${status}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Frequência: ${frequencia}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Observações: ${observacoes}`, 10, yPosition);
+                yPosition += 20; // Adiciona um espaço maior antes de começar o próximo checklist
+            });
+
+            // Gera o PDF
+            doc.save('checklists_selecionados.pdf');
+        }
+
+        // Adiciona evento ao botão de gerar PDF
+        generatePdfBtn.addEventListener('click', generatePdf);
+
+        // Inicializa a tabela e preenche o filtro de clientes
+        renderizarChecklists(checklists);
+        populateClientFilter();
+    </script>
+</body>
+</html>

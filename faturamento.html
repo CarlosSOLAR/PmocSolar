@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FATURAMENTO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            padding: 20px;
+            color: white;
+            box-sizing: border-box;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #fdd835;
+            color: #0056b3;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #fbc02d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .scrollable {
+            max-height: 40vh; /* Define altura máxima como porcentagem da altura da tela */
+            overflow-y: auto; /* Ativa a rolagem vertical */
+            margin-top: 20px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: 150px;
+            margin: 0 15px;
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d;
+        }
+        .menu-button {
+            text-align: center;
+            flex-grow: 2;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>FATURAMENTO</h2>
+    <div class="container">
+        <form id="faturamentoForm">
+            <!-- Cliente -->
+            <label for="cliente">Cliente</label>
+            <select id="cliente" name="cliente" required>
+                <!-- Clientes cadastrados serão carregados aqui -->
+            </select>
+
+            <!-- Número da Fatura -->
+            <label for="numero_fatura">Número da Fatura</label>
+            <input type="text" id="numero_fatura" name="numero_fatura" required>
+
+            <!-- Data -->
+            <label for="data_fatura">Data</label>
+            <input type="date" id="data_fatura" name="data_fatura" required>
+
+            <!-- Itens Faturados -->
+            <label for="itens">Itens Faturados</label>
+            <textarea id="itens" name="itens" required></textarea>
+
+            <!-- Valor Total -->
+            <label for="valor_total">Valor Total</label>
+            <input type="number" id="valor_total" name="valor_total" step="0.01" required>
+
+            <button type="submit">Salvar Fatura</button>
+        </form>
+    </div>
+
+    <div class="scrollable">
+        <table id="faturasList">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Número da Fatura</th>
+                    <th>Itens</th>
+                    <th>Valor Total</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='index.html'">Avançar</button>
+    </div>
+
+    <script>
+        const faturamentoForm = document.getElementById('faturamentoForm');
+        const faturasList = document.querySelector('#faturasList tbody');
+        let faturas = JSON.parse(localStorage.getItem('faturas')) || [];
+
+        // Função para salvar a fatura no localStorage
+        faturamentoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const faturaData = {
+                cliente: document.getElementById('cliente').value,
+                numero_fatura: document.getElementById('numero_fatura').value,
+                data_fatura: document.getElementById('data_fatura').value,
+                itens: document.getElementById('itens').value,
+                valor_total: document.getElementById('valor_total').value
+            };
+
+            faturas.push(faturaData);
+            localStorage.setItem('faturas', JSON.stringify(faturas));
+            faturamentoForm.reset();
+            renderizarFaturas();
+        });
+
+        // Função para carregar os clientes do localStorage e preencher o select
+        function carregarClientes() {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            const clienteSelect = document.getElementById('cliente');
+            clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clientes.forEach(cliente => {
+                clienteSelect.innerHTML += `<option value="${cliente.nome_cliente}">${cliente.nome_cliente}</option>`;
+            });
+        }
+
+        // Função para renderizar as faturas salvas na tabela
+        function renderizarFaturas() {
+            faturasList.innerHTML = ''; // Limpa a tabela antes de preencher
+            faturas.forEach((fatura, index) => {
+                faturasList.innerHTML += `
+                    <tr>
+                        <td>${fatura.data_fatura}</td>
+                        <td>${fatura.cliente}</td>
+                        <td>${fatura.numero_fatura}</td>
+                        <td>${fatura.itens}</td>
+                        <td>R$ ${fatura.valor_total}</td>
+                        <td>
+                            <button onclick="editarFatura(${index})">Editar</button>
+                            <button onclick="deletarFatura(${index})">Deletar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Função para editar uma fatura
+        function editarFatura(index) {
+            const fatura = faturas[index];
+            document.getElementById('cliente').value = fatura.cliente;
+            document.getElementById('numero_fatura').value = fatura.numero_fatura;
+            document.getElementById('data_fatura').value = fatura.data_fatura;
+            document.getElementById('itens').value = fatura.itens;
+            document.getElementById('valor_total').value = fatura.valor_total;
+
+            faturas.splice(index, 1); // Remove a fatura atual para que seja atualizada
+        }
+
+        // Função para deletar uma fatura
+        function deletarFatura(index) {
+            faturas.splice(index, 1); // Remove a fatura da lista
+            localStorage.setItem('faturas', JSON.stringify(faturas)); // Atualiza o localStorage
+            renderizarFaturas(); // Re-renderiza a tabela com as faturas atualizadas
+        }
+
+        // Chamada para carregar clientes e faturas ao carregar a página
+        window.onload = () => {
+            carregarClientes(); // Carrega clientes do localStorage
+            renderizarFaturas(); // Renderiza faturas salvas no localStorage
+        };
+    </script>
+</body>
+</html>

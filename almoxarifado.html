@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALMOXARIFADO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            padding: 20px;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #fdd835;
+            color: #0056b3;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #fbc02d;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3; /* Mesma cor de fundo azul */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835; /* Fundo amarelo */
+            color: #0056b3; /* Texto azul escuro */
+            border: none;
+            cursor: pointer;
+            width: 150px; /* Ajuste na largura dos botões */
+ margin: 0 15px; /* Espaçamento horizontal entre os botões */
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d; /* Amarelo mais escuro no hover */
+        }
+        . .prev, .next {
+            flex-grow: 1;
+            text-align: center;
+            max-width: 150px;
+        }
+        .menu-button {
+            flex-grow: 2;
+            text-align: center;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>ALMOXARIFADO</h2>
+    <div class="container">
+        <form id="almoxarifadoForm">
+            <!-- Data de Registro -->
+            <label for="data_registro">Data de Registro</label>
+            <input type="text" id="data_registro" name="data_registro" readonly>
+
+            <!-- Nome da Peça ou Ferramenta -->
+            <label for="nome_item">Nome da Peça ou Ferramenta</label>
+            <input type="text" id="nome_item" name="nome_item" required>
+
+            <!-- Quantidade -->
+            <label for="quantidade">Quantidade</label>
+            <input type="number" id="quantidade" name="quantidade" required>
+
+            <!-- Local de Armazenamento -->
+            <label for="local_armazenamento">Local de Armazenamento</label>
+            <input type="text" id="local_armazenamento" name="local_armazenamento" required>
+
+            <!-- Categoria -->
+            <label for="categoria">Categoria</label>
+            <select id="categoria" name="categoria" required>
+                <option value="">Selecione a categoria</option>
+                <option value="Ferramenta">Ferramenta</option>
+                <option value="Peça">Peça</option>
+            </select>
+
+            <!-- Observações -->
+            <label for="observacoes">Observações</label>
+            <textarea id="observacoes" name="observacoes" required></textarea>
+
+            <button type="submit">Salvar Item</button>
+        </form>
+    </div>
+
+    <div class="scrollable">
+        <table id="almoxarifadoList">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Nome do Item</th>
+                    <th>Quantidade</th>
+                    <th>Local</th>
+                    <th>Categoria</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='relatorios2.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='faturamento.html'">Avançar</button>
+    </div>
+
+    <script>
+        const almoxarifadoForm = document.getElementById('almoxarifadoForm');
+        const almoxarifadoList = document.querySelector('#almoxarifadoList tbody');
+        let itens = JSON.parse(localStorage.getItem('itens')) || [];
+        let editIndex = null;
+
+        // Função para gerar a data de registro
+        function gerarDataRegistro() {
+            const hoje = new Date();
+            const dia = String(hoje.getDate()).padStart(2, '0');
+            const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+            const ano = hoje.getFullYear();
+            document.getElementById('data_registro').value = `${dia}/${mes}/${ano}`;
+        }
+
+        // Função para salvar o item no localStorage
+        almoxarifadoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const itemData = {
+                data_registro: document.getElementById('data_registro').value,
+                nome_item: document.getElementById('nome_item').value,
+                quantidade: document.getElementById('quantidade').value,
+                local_armazenamento: document.getElementById('local_armazenamento').value,
+                categoria: document.getElementById('categoria').value,
+                observacoes: document.getElementById('observacoes').value
+            };
+
+            if (editIndex === null) {
+                itens.push(itemData);
+            } else {
+                itens[editIndex] = itemData;
+                editIndex = null;
+            }
+
+            localStorage.setItem('itens', JSON.stringify(itens));
+            almoxarifadoForm.reset();
+            gerarDataRegistro();
+            renderizarItens();
+        });
+
+        // Função para renderizar os itens na tabela
+        function renderizarItens() {
+            almoxarifadoList.innerHTML = '';
+            itens.forEach((item, index) => {
+                almoxarifadoList.innerHTML += `
+                    <tr>
+                        <td>${item.data_registro}</td>
+                        <td>${item.nome_item}</td>
+                        <td>${item.quantidade}</td>
+                        <td>${item.local_armazenamento}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.observacoes}</td>
+                        <td>
+                            <button onclick="editarItem(${index})">Editar</button>
+                            <button onclick="deletarItem(${index})">Deletar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Função para editar um item
+        function editarItem(index) {
+            editIndex = index;
+            const item = itens[index];
+            document.getElementById('data_registro').value = item.data_registro;
+            document.getElementById('nome_item').value = item.nome_item;
+            document.getElementById('quantidade').value = item.quantidade;
+            document.getElementById('local_armazenamento').value = item.local_armazenamento;
+            document.getElementById('categoria').value = item.categoria;
+            document.getElementById('observacoes').value = item.observacoes;
+        }
+
+        // Função para deletar um item
+        function deletarItem(index) {
+            itens.splice(index, 1);
+            localStorage.setItem('itens', JSON.stringify(itens));
+            renderizarItens();
+        }
+
+        // Carrega a data de registro e os itens ao carregar a página
+        window.onload = () => {
+            gerarDataRegistro();
+            renderizarItens();
+        };
+    </script>
+</body>
+</html>

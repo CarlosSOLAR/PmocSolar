@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALMOXARIFADO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            padding: 20px;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+         .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: 150px;
+            margin: 0 15px;
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d;
+        }
+        .menu-button {
+            text-align: center;
+            flex-grow: 2;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+       #gerarRelatorio {
+              padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: calc(100% - 40px);
+            max-width: 600px;
+            margin-bottom: 20px;
+            margin-top: 40px;
+            position: relative; /* Corrigido para não sobrepor à navegação inferior */
+        }
+        .button-container {
+            text-align: center;
+        }
+        #gerarRelatorio:hover {
+            background-color: #fbc02d;
+        }
+    </style>
+</head>
+<body>
+    <h2>RELATÓRIO DE ESTOQUE</h2>
+    <div class="container">
+        <form id="almoxarifadoForm">
+            <!-- Nome da Peça ou Ferramenta -->
+            <label for="nome_item">Nome da Peça ou Ferramenta</label>
+            <input type="text" id="nome_item" name="nome_item" placeholder="Filtrar por nome">
+            
+            <!-- Categoria -->
+            <label for="categoria">Categoria</label>
+            <select id="categoria" name="categoria" required>
+                <option value="">Todas as categorias</option>
+                <option value="Ferramenta">Ferramenta</option>
+                <option value="Peça">Peça</option>
+            </select>
+        </form>
+        <div class="scrollable">
+            <table id="almoxarifadoList">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Nome do Item</th>
+                        <th>Quantidade</th>
+                        <th>Local</th>
+                        <th>Categoria</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    
+ <div class="button-container">
+        <button id="gerarRelatorio">Gerar Relatório em PDF</button>
+</div>
+        
+         <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='relatorios2.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='index.html'">Avançar</button>
+    </div>
+        
+        <script>
+            const almoxarifadoForm = document.getElementById('almoxarifadoForm');
+            const almoxarifadoList = document.querySelector('#almoxarifadoList tbody');
+            const nomeItemInput = document.getElementById('nome_item');
+            const categoriaSelect = document.getElementById('categoria');
+            const gerarRelatorioButton = document.getElementById('gerarRelatorio');
+
+            let itens = JSON.parse(localStorage.getItem('itens')) || [];
+            let editIndex = null;
+
+            // Função para renderizar os itens na tabela
+            function renderizarItens(filtroNome = '', filtroCategoria = '') {
+                almoxarifadoList.innerHTML = '';
+
+                // Filtragem dos itens por nome e categoria
+                const itensFiltrados = itens.filter(item => {
+                    const nomeMatches = item.nome_item.toLowerCase().includes(filtroNome.toLowerCase());
+                    const categoriaMatches = filtroCategoria === '' || item.categoria === filtroCategoria;
+                    return nomeMatches && categoriaMatches;
+                });
+
+                itensFiltrados.forEach((item) => {
+                    almoxarifadoList.innerHTML += `
+                        <tr>
+                            <td>${item.data_registro}</td>
+                            <td>${item.nome_item}</td>
+                            <td>${item.quantidade}</td>
+                            <td>${item.local_armazenamento}</td>
+                            <td>${item.categoria}</td>
+                            <td>${item.observacoes}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Filtro de nome ao digitar no campo de nome da peça
+            nomeItemInput.addEventListener('input', () => {
+                const filtroNome = nomeItemInput.value;
+                const filtroCategoria = categoriaSelect.value;
+                renderizarItens(filtroNome, filtroCategoria);
+            });
+
+            // Filtro de categoria ao selecionar uma categoria
+            categoriaSelect.addEventListener('change', () => {
+                const filtroNome = nomeItemInput.value;
+                const filtroCategoria = categoriaSelect.value;
+                renderizarItens(filtroNome, filtroCategoria);
+            });
+
+            // Função para gerar o PDF
+            gerarRelatorioButton.addEventListener('click', () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFontSize(18);
+                doc.text('Relatório de Almoxarifado', 14, 20);
+                doc.setFontSize(12);
+                
+                const itensFiltrados = Array.from(almoxarifadoList.getElementsByTagName('tr'));
+                const data = itensFiltrados.map(tr => Array.from(tr.children).map(td => td.innerText));
+
+                let startY = 40;
+                data.forEach((row, index) => {
+                    row.forEach((cell, i) => {
+                        doc.text(cell, 14 + (i * 40), startY + (index * 10));
+                    });
+                });
+
+                doc.save('relatorio_almoxarifado.pdf');
+            });
+
+            // Carrega os itens ao carregar a página
+            window.onload = () => {
+                renderizarItens();
+            };
+        </script>
+   
+</body>
+</html>

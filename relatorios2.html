@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Manutenção</title>
+    <title>RELATÓRIOS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
         }
         #data-hora {
             text-align: center;
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 20px;
             color: white; /* Cor branca para o texto de data e hora */
         }
@@ -26,14 +26,14 @@
             max-width: 600px;
             margin: 0 auto;
             background-color: #fff; /* Fundo branco para a área de botões principais */
-            padding: 10px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
         }
         button {
             width: 100%;
-            padding: 9px;
+            padding: 10px;
             margin-bottom: 20px;
             background-color: #fdd835; /* Amarelo */
             color: #0056b3; /* Azul escuro */
@@ -87,29 +87,27 @@
 </head>
 <body>
 
-    <h1>CONTROLE DE MANUTENÇÃO</h1>
+    <h1>RELATÓRIOS</h1>
     <div id="data-hora"></div>
 
     <div class="container">
-        <button onclick="window.location.href='cadastro-clientes.html'">Clientes</button>
-        <button onclick="window.location.href='cadastrar-serviços.html'">Serviços</button>
-        <button onclick="window.location.href='cadastro-equipamentos.html'">Equipamentos</button>
-        <button onclick="window.location.href='plano-manutenção.html'">Planos de Manuteçao</button>
-        <button onclick="window.location.href='controle-os.html'">Ordem de Serviço</button>
-     <button onclick="window.location.href='checklist.html'">Checklist</button>
-    <button onclick="window.location.href='Orçamento.html'">Orçamentos</button>
-        <button onclick="window.location.href='relatorios2.html'">Relatórios</button>
-        <button onclick="window.location.href='almoxarifado.html'">Almoxarifado</button>
-        <button onclick="window.location.href='faturamento.html'">Faturamento</button>
+        <button onclick="window.location.href='Relclientes.html'">Relatórios de Clientes</button>
+        <button onclick="window.location.href='Relservicos.html'">Relatórios de Serviços</button>
+        <button onclick="window.location.href='Relequipamento.html'"> Relatórios de Equipamentos</button>
+        <button onclick="window.location.href='Relplanos.html'"> Relatórios de Planos de Manuteçao</button>
+        <button onclick="window.location.href='Relordem.html'"> Relatórios de Ordem de Serviço</button>
+        <button onclick="window.location.href='Relchecklist.html'">Relatório de Checklists</button>
+        <button onclick="window.location.href='Relalmoxarifado.html'">Relatórios Almoxarifado</button>
 
+        <button onclick="window.location.href='Relfaturamento.html'">Relatorio de Faturamento</button>
     </div>
 
     <div class="bottom-nav">
-        <button class="prev" onclick="window.location.href='pagina-anterior.html'">Fechar</button>
+        <button class="prev" onclick="window.location.href='orçamento.html'">Fechar</button>
         <div class="menu-button">
             <button onclick="window.location.href='index.html'">MENU</button>
         </div>
-        <button class="next" onclick="window.location.href='cadastro-clientes.html'">Avançar</button>
+        <button class="next" onclick="window.location.href='almoxarifado.html'">Avançar</button>
     </div>
 
     <script>

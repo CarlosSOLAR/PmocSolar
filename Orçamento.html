@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orçamentos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #fdd835;
+            color: #0056b3;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            color: #fdd835;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: 150px;
+            margin: 0 15px;
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d;
+        }
+        .menu-button {
+            text-align: center;
+            flex-grow: 2;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .arrow {
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .dropdown-content a.approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .dropdown-content a.edit {
+            background-color: #fdd835;
+            color: #0056b3;
+        }
+
+        .dropdown-content a.delete {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .dropdown-content a:hover.approve {
+            background-color: #45a049;
+        }
+
+        .dropdown-content a:hover.edit {
+            background-color: #e1c31d;
+        }
+
+        .dropdown-content a:hover.delete {
+            background-color: #e60000;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Orçamentos</h1>
+        <form id="orcamentoForm">
+            <div class="form-group">
+                <label for="data_orcamento">Data do Orçamento:</label>
+                <input type="date" id="data_orcamento" required>
+            </div>
+            <div class="form-group">
+                <label for="cliente">Cliente:</label>
+                <input type="text" id="cliente" required>
+            </div>
+            <div class="form-group">
+                <label for="descricao_servico">Descrição do Serviço:</label>
+                <textarea id="descricao_servico" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="valor_estimado">Valor Estimado:</label>
+                <input type="number" id="valor_estimado" required>
+            </div>
+            <div class="form-group">
+                <label for="prazo_execucao">Prazo de Execução:</label>
+                <input type="text" id="prazo_execucao" required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit">Salvar Orçamento</button>
+                <button type="button" id="printOrcamentoBtn">Imprimir Orçamento</button>
+            </div>
+        </form>
+
+        <h2>Orçamentos Cadastrados</h2>
+        <div class="scrollable">
+            <table id="orcamentoTable">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Descrição do Serviço</th>
+                        <th>Valor Estimado</th>
+                        <th>Prazo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- As linhas da tabela serão inseridas aqui dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+ <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='checklist.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='relatorios2.html'">Avançar</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const orcamentoForm = document.getElementById('orcamentoForm');
+        let orcamentos = JSON.parse(localStorage.getItem('orcamentos')) || [];
+        let editIndex = null;
+
+        // Função para renderizar os orçamentos em uma tabela
+        function renderOrcamentos() {
+            const orcamentoTableBody = document.querySelector('#orcamentoTable tbody');
+            orcamentoTableBody.innerHTML = ''; // Limpa a tabela antes de renderizar
+
+            orcamentos.forEach((orcamento, index) => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${orcamento.data_orcamento}</td>
+                    <td>${orcamento.cliente}</td>
+                    <td>${orcamento.descricao_servico}</td>
+                    <td>${orcamento.valor_estimado}</td>
+                    <td>${orcamento.prazo_execucao}</td>
+                    <td>
+                        <div class="dropdown">
+                            <span class="arrow">▼</span>
+                            <div class="dropdown-content">
+                                <a href="#" class="approve" onclick="approveOrcamento(${index})">Aprovar</a>
+                                <a href="#" class="edit" onclick="editOrcamento(${index})">Editar</a>
+                                <a href="#" class="delete" onclick="deleteOrcamento(${index})">Excluir</a>
+                            </div>
+                        </div>
+                    </td>
+                `;
+
+                orcamentoTableBody.appendChild(row);
+            });
+        }
+
+        // Função para salvar o orçamento
+        function saveOrcamento(e) {
+            e.preventDefault();
+
+            const orcamento = {
+                data_orcamento: document.getElementById('data_orcamento').value,
+                cliente: document.getElementById('cliente').value,
+                descricao_servico: document.getElementById('descricao_servico').value,
+                valor_estimado: document.getElementById('valor_estimado').value,
+                prazo_execucao: document.getElementById('prazo_execucao').value
+            };
+
+            if (editIndex === null) {
+                orcamentos.push(orcamento);
+            } else {
+                orcamentos[editIndex] = orcamento;
+                editIndex = null;
+            }
+
+            localStorage.setItem('orcamentos', JSON.stringify(orcamentos));
+            renderOrcamentos();
+            orcamentoForm.reset();
+        }
+
+        // Função para editar um orçamento
+        function editOrcamento(index) {
+            const orcamento = orcamentos[index];
+            document.getElementById('data_orcamento').value = orcamento.data_orcamento;
+            document.getElementById('cliente').value = orcamento.cliente;
+            document.getElementById('descricao_servico').value = orcamento.descricao_servico;
+            document.getElementById('valor_estimado').value = orcamento.valor_estimado;
+            document.getElementById('prazo_execucao').value = orcamento.prazo_execucao;
+
+            editIndex = index; // Definir o índice do orçamento a ser editado
+        }
+
+        // Função para excluir um orçamento
+        function deleteOrcamento(index) {
+            if (confirm('Tem certeza que deseja excluir este orçamento?')) {
+                orcamentos.splice(index, 1);
+                localStorage.setItem('orcamentos', JSON.stringify(orcamentos));
+                renderOrcamentos();
+            }
+        }
+// Função para aprovar um orçamento
+        function approveOrcamento(index) {
+            alert(`Orçamento de ${orcamentos[index].cliente} aprovado!`);
+        }
+
+        // Função para gerar o PDF do orçamento
+        function gerarPDFOrcamento(orcamento) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+            doc.text('Proposta de Orçamento', 20, 20);
+            doc.setFontSize(12);
+            doc.text(`Data do Orçamento: ${orcamento.data_orcamento}`, 20, 40);
+            doc.text(`Cliente: ${orcamento.cliente}`, 20, 50);
+            doc.text(`Descrição do Serviço: ${orcamento.descricao_servico}`, 20, 60);
+            doc.text(`Valor Estimado: ${orcamento.valor_estimado}`, 20, 70);
+            doc.text(`Prazo de Execução: ${orcamento.prazo_execucao}`, 20, 80);
+
+            doc.save(`Orcamento_${orcamento.cliente}.pdf`);
+        }
+
+        // Função para imprimir o orçamento selecionado
+        function imprimirOrcamento() {
+            const index = orcamentos.length - 1; // Último orçamento salvo
+            const orcamento = orcamentos[index];
+            gerarPDFOrcamento(orcamento);
+        }
+
+        // Evento para capturar o clique no botão de imprimir orçamento
+        document.getElementById('printOrcamentoBtn').addEventListener('click', function () {
+            if (orcamentos.length === 0) {
+                alert('Nenhum orçamento para imprimir.');
+            } else {
+                imprimirOrcamento();
+            }
+        });
+
+        // Evento para salvar o orçamento
+        orcamentoForm.addEventListener('submit', saveOrcamento);
+
+        // Carrega os orçamentos ao iniciar a página
+        window.onload = function () {
+            renderOrcamentos();
+        };
+    </script>
+</body>
+</html>

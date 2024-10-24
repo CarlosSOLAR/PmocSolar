@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios de Serviços</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3; /* Azul */
+            padding: 20px;
+            color: white; /* Cor do texto branco para contraste */
+            position: relative; /* Para o posicionamento do botão */
+            min-height: 100vh; /* Para garantir que o corpo da página tenha altura mínima */
+            padding-bottom: 60px; /* Espaço para o botão fixo na parte inferior */
+        }
+        h2 {
+            text-align: center;
+            color: white; /* Cor branca para o título */
+            font-size: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+border: 1px solid white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+               .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: 150px;
+            margin: 0 15px;
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d;
+        }
+        .menu-button {
+            text-align: center;
+            flex-grow: 2;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        #downloadPdf {
+                     padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: calc(100% - 40px);
+            max-width: 600px;
+            margin-bottom: 20px;
+            margin-top: 40px;
+            position: relative; /* Corrigido para não sobrepor à navegação inferior */
+        }
+        .button-container {
+            text-align: center;
+        }
+        #downloadPdf:hover {
+            background-color: #fbc02d; /* Amarelo mais escuro */
+        }
+    </style>
+</head>
+<body>
+    <h2>RELATÓRIOS DE SERVIÇOS</h2>
+    <div class="container">
+
+        <!-- Filtro de Tipo de Serviço -->
+        <label for="tipoFiltro">Filtrar por Tipo de Serviço:</label>
+        <select id="tipoFiltro">
+            <option value="todos">Todos</option>
+            <option value="preventivo">Preventivo</option>
+            <option value="corretivo">Corretivo</option>
+            <option value="preditivo">Preditivo</option>
+        </select>
+
+        <div id="servicoListContainer" class="scrollable">
+            <table id="servicoList">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Frequência</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+ <div class="button-container">
+    <!-- Botão fixo para baixar o PDF -->
+    <button id="downloadPdf">Baixar PDF</button>
+</div>
+
+ <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='relatorios2.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='index.html'">Avançar</button>
+    </div>
+    
+    <script>
+        const { jsPDF } = window.jspdf;
+        const servicoList = document.querySelector('#servicoList tbody');
+        const tipoFiltro = document.getElementById('tipoFiltro');
+        let servicos = JSON.parse(localStorage.getItem('servicos')) || [];
+
+        // Função para renderizar os serviços cadastrados na página
+        function renderServicos() {
+            const tipoSelecionado = tipoFiltro.value;
+            servicoList.innerHTML = '';
+            servicos.forEach((servico) => {
+                if (tipoSelecionado === 'todos' || servico.tipo === tipoSelecionado) {
+                    servicoList.innerHTML += `
+                        <tr>
+                            <td>${servico.nome_servico}</td>
+                            <td>${servico.descricao_servico}</td>
+                            <td>${servico.frequencia}</td>
+                            <td>${servico.tipo}</td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+
+        // Evento para filtrar os serviços quando o tipo é alterado
+        tipoFiltro.addEventListener('change', renderServicos);
+
+        // Função para gerar e baixar o PDF
+        document.getElementById('downloadPdf').addEventListener('click', () => {
+            const tipoSelecionado = tipoFiltro.value;
+            const pdf = new jsPDF();
+            pdf.setFontSize(16);
+            pdf.text('Relatório de Serviços', 20, 20);
+            pdf.setFontSize(12);
+            const headers = ['Nome', 'Descrição', 'Frequência', 'Tipo'];
+            const rows = servicos.filter(servico => tipoSelecionado === 'todos' || servico.tipo === tipoSelecionado)
+                .map(servico => [servico.nome_servico, servico.descricao_servico, servico.frequencia, servico.tipo]);
+
+            pdf.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 30,
+                theme: 'grid'
+            });
+
+            pdf.save('relatorio_servicos.pdf');
+        });
+
+        // Renderizar os serviços ao carregar a página
+        window.onload = renderServicos;
+    </script>
+</body>
+</html>

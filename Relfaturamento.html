@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FATURAMENTO</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3;
+            padding: 20px;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: calc(100% - 40px);
+            max-width: 600px;
+            margin-bottom: 20px;
+            margin-top: 40px;
+            position: relative; /* Corrigido para não sobrepor à navegação inferior */
+        }
+        .button-container {
+            text-align: center;
+        }
+        button:hover {
+            background-color: #fbc02d;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            width: 150px;
+            margin: 0 15px;
+        }
+        .bottom-nav button:hover {
+            background-color: #fbc02d;
+        }
+        .menu-button {
+            text-align: center;
+            flex-grow: 2;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .filter-row div {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .filter-row div:last-child {
+            margin-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>RELATÓRIOS DE FATURAMENTO</h2>
+    <div class="container">
+        <div class="filter-row">
+            <div>
+                <label for="filtroCliente">Filtrar por Cliente</label>
+                <select id="filtroCliente">
+                    <option value="">Todos os Clientes</option>
+                    <!-- Clientes cadastrados serão carregados aqui -->
+                </select>
+            </div>
+            <div>
+                <label for="filtroItens">Filtrar por Itens</label>
+                <input type="text" id="filtroItens" placeholder="Digite um item">
+            </div>
+        </div>
+        <div class="filter-row">
+            <div>
+                <label for="dataInicial">Data Inicial</label>
+                <input type="date" id="dataInicial">
+            </div>
+            <div>
+                <label for="dataFinal">Data Final</label>
+                <input type="date" id="dataFinal">
+            </div>
+        </div>
+        <div class="filter-row">
+            <div>
+                <label for="valorMinimo">Valor Mínimo</label>
+                <input type="number" id="valorMinimo" placeholder="Valor Mínimo">
+            </div>
+            <div>
+                <label for="valorMaximo">Valor Máximo</label>
+                <input type="number" id="valorMaximo" placeholder="Valor Máximo">
+            </div>
+        </div>
+        <div class="scrollable">
+            <table id="faturasList">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Número da Fatura</th>
+                        <th>Itens</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    
+   <div class="button-container">
+    <button id="gerarPDF">Gerar PDF</button>
+</div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='relatorios2.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='index.html'">Avançar</button>
+    </div>
+    
+    <script>
+        const faturasList = document.querySelector('#faturasList tbody');
+        const filtroCliente = document.getElementById('filtroCliente');
+        const filtroItens = document.getElementById('filtroItens');
+        const dataInicial = document.getElementById('dataInicial');
+        const dataFinal = document.getElementById('dataFinal');
+        const valorMinimo = document.getElementById('valorMinimo');
+        const valorMaximo = document.getElementById('valorMaximo');
+        const gerarPDF = document.getElementById('gerarPDF');
+        const selectAll = document.getElementById('selectAll');
+        let faturas = JSON.parse(localStorage.getItem('faturas')) || [];
+
+        // Função para carregar os clientes do localStorage e preencher o select
+        function carregarClientes() {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            filtroCliente.innerHTML = '<option value="">Todos os Clientes</option>';
+            clientes.forEach(cliente => {
+                filtroCliente.innerHTML += `<option value="${cliente.nome_cliente}">${cliente.nome_cliente}</option>`;
+            });
+        }
+
+        // Função para formatar data
+        function formatarData(data) {
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0'); // Meses começam do zero
+            const ano = data.getFullYear();
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        // Função para renderizar as faturas salvas na tabela
+        function renderizarFaturas() {
+            const clienteSelecionado = filtroCliente.value;
+            const itemFiltrado = filtroItens.value.toLowerCase();
+            const dataIni = new Date(dataInicial.value);
+            const dataFin = new Date(dataFinal.value);
+            const valorMin = parseFloat(valorMinimo.value) || 0;
+            const valorMax = parseFloat(valorMaximo.value) || Infinity;
+
+            faturasList.innerHTML = ''; // Limpa a tabela antes de preencher
+
+            faturas.forEach(fatura => {
+                const dataFatura = new Date(fatura.data_fatura);
+                const valorFatura = parseFloat(fatura.valor_total);
+
+                if (
+                    (clienteSelecionado === '' || fatura.cliente === clienteSelecionado) &&
+                    (itemFiltrado === '' || fatura.itens.toLowerCase().includes(itemFiltrado)) &&
+                    (isNaN(dataIni.getTime()) || dataFatura >= dataIni) &&
+                    (isNaN(dataFin.getTime()) || dataFatura <= dataFin) &&
+                    (valorFatura >= valorMin && valorFatura <= valorMax)
+                ) {
+                    faturasList.innerHTML += `
+                        <tr>
+                            <td><input type="checkbox" class="checkbox-fatura" data-fatura='${JSON.stringify(fatura)}'></td>
+                            <td>${formatarData(dataFatura)}</td>
+                            <td>${fatura.cliente}</td>
+                            <td>${fatura.numero_fatura}</td>
+                            <td>${fatura.itens}</td>
+                            <td>R$ ${fatura.valor_total}</td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+
+        // Função para gerar e baixar o PDF
+        function gerarPDFHandler() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const checkboxes = document.querySelectorAll('.checkbox-fatura:checked');
+            const faturasSelecionadas = Array.from(checkboxes).map(checkbox => JSON.parse(checkbox.dataset.fatura));
+
+            if (faturasSelecionadas.length === 0) {
+                alert('Nenhuma fatura selecionada.');
+                return;
+            }
+
+            doc.text('Faturas Selecionadas', 14, 10);
+            doc.autoTable({
+// Cabeçalho da tabela
+                head: [['Data', 'Cliente', 'Número da Fatura', 'Itens', 'Valor Total']],
+                body: faturasSelecionadas.map(fatura => [
+                    formatarData(new Date(fatura.data_fatura)),
+                    fatura.cliente,
+                    fatura.numero_fatura,
+                    fatura.itens,
+                    `R$ ${fatura.valor_total}`
+                ]),
+            });
+
+            doc.save('faturas_selecionadas.pdf');
+        }
+
+        // Adiciona eventos aos filtros
+        filtroCliente.addEventListener('change', renderizarFaturas);
+        filtroItens.addEventListener('input', renderizarFaturas);
+        dataInicial.addEventListener('change', renderizarFaturas);
+        dataFinal.addEventListener('change', renderizarFaturas);
+        valorMinimo.addEventListener('input', renderizarFaturas);
+        valorMaximo.addEventListener('input', renderizarFaturas);
+        gerarPDF.addEventListener('click', gerarPDFHandler);
+
+        // Adiciona evento para selecionar/deselecionar todas as faturas
+        selectAll.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.checkbox-fatura');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        });
+
+        // Carregar clientes e faturas na inicialização
+        carregarClientes();
+        renderizarFaturas();
+    </script>
+</body>
+</html>

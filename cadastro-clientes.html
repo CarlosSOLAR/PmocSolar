@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3; /* Azul */
+            padding: 20px;
+            color: white; /* Cor do texto branco para contraste */
+        }
+        h2 {
+            text-align: center;
+            color: white; /* Cor branca para o título */
+            font-size: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+           background-color: #fff;
+            color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+             border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #fdd835;
+            color: #0056b3;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #fbc02d;
+        }
+        .action-btn {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 5px;
+            background-color: #ff7043;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .action-btn.edit {
+            background-color: #2196F3;
+        }
+        .action-btn.delete {
+            background-color: #f44336;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835; /* Fundo amarelo */
+            color: #0056b3; /* Texto azul escuro */
+            border: none;
+            cursor: pointer;
+            max-width: 150px; /* Ajuste na largura dos botões */
+            margin: 0 15px; /* Espaçamento horizontal entre os botões */
+        }
+        .prev, .next {
+            flex-grow: 1;
+            text-align: center;
+            max-width: 150px;
+        }
+        .menu-button {
+            flex-grow: 2;
+            text-align: center;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .scrollable {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>CADASTRO DE CLIENTES</h2>
+    <div class="container">
+        <form id="clienteForm">
+            <label for="nome_cliente">Nome do Cliente</label>
+            <input type="text" id="nome_cliente" name="nome_cliente" required>
+
+            <label for="email_cliente">Email</label>
+            <input type="email" id="email_cliente" name="email_cliente" required>
+
+            <label for="telefone_cliente">Telefone</label>
+            <input type="text" id="telefone_cliente" name="telefone_cliente" required>
+
+            <label for="endereco_cliente">Endereço</label>
+            <input type="text" id="endereco_cliente" name="endereco_cliente" required>
+
+            <button type="submit">Cadastrar Cliente</button>
+        </form>
+
+        <div id="clienteListContainer" class="scrollable">
+            <table id="clienteList">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Endereço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='index.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='cadastrar-serviços.html'">Avançar</button>
+    </div>
+
+    <script>
+        const clienteForm = document.getElementById('clienteForm');
+        const clienteList = document.querySelector('#clienteList tbody');
+        let clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+        let editIndex = null;
+
+        // Função para renderizar os clientes cadastrados na página
+        function renderClientes() {
+            clienteList.innerHTML = '';
+            clientes.forEach((cliente, index) => {
+                clienteList.innerHTML += `
+                    <tr>
+                        <td>${cliente.nome_cliente}</td>
+                        <td>${cliente.email_cliente}</td>
+                        <td>${cliente.telefone_cliente}</td>
+                        <td>${cliente.endereco_cliente}</td>
+                        <td>
+                            <button class="action-btn edit" onclick="editCliente(${index})">Editar</button>
+                            <button class="action-btn delete" onclick="deleteCliente(${index})">Apagar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Função para salvar o cliente no localStorage
+        clienteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const clienteData = {
+                nome_cliente: document.getElementById('nome_cliente').value,
+                email_cliente: document.getElementById('email_cliente').value,
+                telefone_cliente: document.getElementById('telefone_cliente').value,
+                endereco_cliente: document.getElementById('endereco_cliente').value
+            };
+
+            if (editIndex === null) {
+                clientes.push(clienteData);
+            } else {
+                clientes[editIndex] = clienteData;
+                editIndex = null;
+            }
+
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            renderClientes();
+            clienteForm.reset();
+        });
+
+        // Função para editar um cliente
+        function editCliente(index) {
+            const cliente = clientes[index];
+            document.getElementById('nome_cliente').value = cliente.nome_cliente;
+            document.getElementById('email_cliente').value = cliente.email_cliente;
+            document.getElementById('telefone_cliente').value = cliente.telefone_cliente;
+            document.getElementById('endereco_cliente').value = cliente.endereco_cliente;
+
+            editIndex = index;
+        }
+
+        // Função para apagar um cliente
+        function deleteCliente(index) {
+            clientes.splice(index, 1);
+            localStorage.setItem('clientes', JSON.stringify(clientes));
+            renderClientes();
+        }
+
+        // Renderizar os clientes ao carregar a página
+        window.onload = renderClientes;
+    </script>
+
+</body>
+</html>
