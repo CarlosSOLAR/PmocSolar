@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Serviços</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0056b3; /* Azul */
+            padding: 20px;
+            color: white; /* Cor do texto branco para contraste */
+        }
+        h2 {
+            text-align: center;
+            color: white; /* Cor branca para o título */
+            font-size: 24px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+          background-color: #fff;
+            color: #0056b3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+              border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #fdd835;
+            color: #0056b3;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #fbc02d;
+        }
+        .action-btn {
+            display: inline-block;
+            padding: 5px 10px;
+            margin-right: 5px;
+            background-color: #ff7043;
+            color: #0056b3;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .action-btn.edit {
+            background-color: #2196F3;
+        }
+        .action-btn.delete {
+            background-color: #f44336;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav button {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            background-color: #fdd835; /* Fundo amarelo */
+            color: #0056b3; /* Texto azul escuro */
+            border: none;
+            cursor: pointer;
+            max-width: 150px; /* Ajuste na largura dos botões */
+            margin: 0 15px; /* Espaçamento horizontal entre os botões */
+        }
+        .prev, .next {
+            flex-grow: 1;
+            text-align: center;
+            max-width: 150px;
+        }
+        .menu-button {
+            flex-grow: 2;
+            text-align: center;
+        }
+        .menu-button button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .scrollable {
+            max-height: 200px;
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>CADASTRO DE SERVIÇOS</h2>
+    <div class="container">
+        <form id="servicoForm">
+            <label for="nome_servico">Nome do Serviço</label>
+            <input type="text" id="nome_servico" name="nome_servico" required>
+
+            <label for="descricao_servico">Descrição do Serviço</label>
+            <textarea id="descricao_servico" name="descricao_servico" required></textarea>
+
+            <label for="frequencia">Frequência</label>
+            <select id="frequencia" name="frequencia" required>
+                <option value="semanal">Semanal</option>
+                <option value="mensal">Mensal</option>
+                <option value="bimestral">Bimestral</option>
+                <option value="trimestral">Trimestral</option>
+                <option value="semestral">Semestral</option>
+                <option value="anual">Anual</option>
+            </select>
+
+            <label for="tipo">Tipo de Serviço</label>
+            <select id="tipo" name="tipo" required>
+                <option value="preditivo">Preditivo</option>
+                <option value="preventivo">Preventivo</option>
+                <option value="corretivo">Corretivo</option>
+            </select>
+
+            <button type="submit">Cadastrar Serviço</button>
+        </form>
+
+        <div id="servicoListContainer" class="scrollable">
+            <table id="servicoList">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Frequência</th>
+                        <th>Tipo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='cadastro-clientes.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='index.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='cadastro-equipamentos.html'">Avançar</button>
+    </div>
+
+    <script>
+        const servicoForm = document.getElementById('servicoForm');
+        const servicoList = document.querySelector('#servicoList tbody');
+        let servicos = JSON.parse(localStorage.getItem('servicos')) || [];
+        let editIndex = null;
+
+        // Função para renderizar os serviços cadastrados na página
+        function renderServicos() {
+            servicoList.innerHTML = '';
+            servicos.forEach((servico, index) => {
+                servicoList.innerHTML += `
+                    <tr>
+                        <td>${servico.nome_servico}</td>
+                        <td>${servico.descricao_servico}</td>
+                        <td>${servico.frequencia}</td>
+                        <td>${servico.tipo}</td>
+                        <td>
+                            <button class="action-btn edit" onclick="editServico(${index})">Editar</button>
+                            <button class="action-btn delete" onclick="deleteServico(${index})">Apagar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Função para salvar o serviço no localStorage
+        servicoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const servicoData = {
+                nome_servico: document.getElementById('nome_servico').value,
+                descricao_servico: document.getElementById('descricao_servico').value,
+                frequencia: document.getElementById('frequencia').value,
+                tipo: document.getElementById('tipo').value
+            };
+
+            if (editIndex === null) {
+                servicos.push(servicoData);
+            } else {
+                servicos[editIndex] = servicoData;
+                editIndex = null;
+            }
+
+            localStorage.setItem('servicos', JSON.stringify(servicos));
+            renderServicos();
+            servicoForm.reset();
+        });
+
+        // Função para editar um serviço
+        function editServico(index) {
+            const servico = servicos[index];
+            document.getElementById('nome_servico').value = servico.nome_servico;
+            document.getElementById('descricao_servico').value = servico.descricao_servico;
+            document.getElementById('frequencia').value = servico.frequencia;
+            document.getElementById('tipo').value = servico.tipo;
+
+            editIndex = index;
+        }
+
+        // Função para apagar um serviço
+        function deleteServico(index) {
+            servicos.splice(index, 1);
+            localStorage.setItem('servicos', JSON.stringify(servicos));
+            renderServicos();
+        }
+
+        // Renderizar os serviços ao carregar a página
+        window.onload = renderServicos;
+    </script>
+
+</body>
+</html>
