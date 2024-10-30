@@ -63,21 +63,20 @@
         }
         table {
             width: 100%;
-            border-collapse: collapse; /* Para evitar bordas duplicadas */
+            border-collapse: collapse;
         }
         th, td {
-            padding: 10px; /* Espaçamento horizontal */
-            border: 1px solid #ccc; /* Borda das células */
-            line-height: 1.6; /* Aumenta o espaço vertical entre as linhas */
+            padding: 10px;
+            border: 1px solid #ccc;
+            line-height: 1.6;
         }
         th {
-            background-color: #0056b3; /* Fundo do cabeçalho */
+            background-color: #0056b3;
         }
         .scrollable {
-            max-height: 300px; /* Altura máxima da área scrollable */
-            overflow-y: auto; /* Permite rolagem vertical */
+            max-height: 300px;
+            overflow-y: auto;
         }
-        /* Estilo para o botão de download fixo no rodapé */
         .fixed-button {
             padding: 15px;
             font-size: 16px;
@@ -90,7 +89,7 @@
             max-width: 600px;
             margin-bottom: 20px;
             margin-top: 40px;
-            position: relative; /* Corrigido para não sobrepor à navegação inferior */
+            position: relative;
         }
         .button-container {
             text-align: center;
@@ -119,7 +118,6 @@
     </div>
 
     <div class="button-container">
-        <!-- Botão fixo para baixar a lista em PDF -->
         <button class="fixed-button" onclick="generatePDF()">Baixar Lista de Clientes em PDF</button>
     </div>
 
@@ -154,41 +152,40 @@
             const doc = new jsPDF();
 
             doc.setFontSize(18);
-            doc.text('Lista de Clientes', 10, 10);
+            doc.setTextColor("#0056b3");
+            doc.text("Lista de Clientes", 10, 10);
+
             doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0); // Preto para conteúdo da tabela
             let y = 20;
 
-            // Cabeçalho da tabela no PDF
-            doc.text('Nome', 10, y);
-            doc.text('Email', 60, y);
-            doc.text('Telefone', 110, y);
-            doc.text('Endereço', 160, y);
-            y += 10;
+            // Cabeçalho da tabela
+            doc.setFillColor(0, 86, 179); // Azul (#0056b3)
+            doc.setTextColor(255, 255, 255); // Branco para o texto do cabeçalho
+            doc.rect(10, y, 190, 10, "F");
+            doc.text("Nome", 12, y + 7);
+            doc.text("Email", 62, y + 7);
+            doc.text("Telefone", 112, y + 7);
+            doc.text("Endereço", 162, y + 7);
 
-            // Adiciona cada cliente à lista no PDF
+            y += 10;
+            doc.setTextColor(0, 0, 0); // Texto preto para o conteúdo
+
+            // Conteúdo da tabela
             clientes.forEach(cliente => {
-                if (y > 280) { // Verifica se está próximo do final da página
-                    doc.addPage(); // Adiciona nova página se necessário
-                    y = 20; // Redefine a posição Y para o topo da nova página
-                    doc.text('Nome', 10, y);
-                    doc.text('Email', 60, y);
-                    doc.text('Telefone', 110, y);
-                    doc.text('Endereço', 160, y);
-                    y += 10;
-                }
-                doc.text(cliente.nome_cliente, 10, y);
-                doc.text(cliente.email_cliente, 60, y);
-                doc.text(cliente.telefone_cliente, 110, y);
-                doc.text(cliente.endereco_cliente, 160, y);
+                doc.text(cliente.nome_cliente, 12, y);
+                doc.text(cliente.email_cliente, 62, y);
+                doc.text(cliente.telefone_cliente, 112, y);
+                doc.text(cliente.endereco_cliente, 162, y);
                 y += 10;
             });
 
-            // Rodapé do PDF
+            // Rodapé
             doc.setFontSize(10);
-            doc.text('Lista gerada automaticamente', 10, 290);
+            doc.setTextColor(150);
+            doc.text("Lista gerada automaticamente", 10, 290);
 
-            // Baixar o PDF
-            doc.save('lista-de-clientes.pdf');
+            doc.save("lista-de-clientes.pdf");
         }
 
         window.onload = () => {
