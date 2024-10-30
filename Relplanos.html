@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RELATÓRIOS DE PLANOS DE MANUTENCÃO</title>
+    <title>RELATÓRIOS DE PLANOS DE MANUTENÇÃO</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,7 +47,7 @@
             margin-top: 10px;
             border-radius: 5px;
         }
-        .bottom-nav {
+         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -98,7 +98,7 @@
             background-color: #0056b3;
         }
         .fixed-button {
-            padding: 15px;
+         padding: 15px;
             font-size: 16px;
             border-radius: 5px;
             background-color: #fdd835;
@@ -120,7 +120,7 @@
     </style>
 </head>
 <body>
-    <h2>RELATÓRIOS DE PLANOS DE MANUTENCÃO</h2>
+    <h2>RELATÓRIOS DE PLANOS DE MANUTENÇÃO</h2>
     <div class="container">
         <form id="filterForm">
             <label for="filterCliente">Filtrar por Cliente</label>
@@ -147,11 +147,11 @@
         </div>
     </div>
 
-    <div class="button-container">
-        <button class="fixed-button" onclick="generatePDF()">Gerar PDF</button>
-    </div>
+ <div class="button-container">
+    <button class="fixed-button" onclick="generatePDF()">Gerar PDF</button>
+</div>
 
-    <div class="bottom-nav">
+ <div class="bottom-nav">
         <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
         <div class="menu-button">
             <button onclick="window.location.href='relatorios2.html'">MENU</button>
@@ -160,7 +160,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
     <script>
         const planoList = document.querySelector('#planoList tbody');
         const filterCliente = document.getElementById('filterCliente');
@@ -201,36 +200,26 @@
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+
             doc.setFontSize(18);
+            doc.setTextColor("#0056b3");
             doc.text('Planos de Manutenção', 105, 20, { align: 'center' });
 
-            const tableData = planosFiltrados.map(plano => [
-                plano.cliente,
-                plano.equipamentos.join(', '),
-                plano.servicos.join(', '),
-                plano.vigencia_inicio,
-                plano.vigencia_fim,
-                plano.frequencia
-            ]);
+            doc.setFontSize(12);
+            let startY = 40;
 
-            doc.autoTable({
-                head: [['Cliente', 'Equipamentos', 'Serviços', 'Início', 'Fim', 'Frequência']],
-                body: tableData,
-                startY: 30,
-                styles: {
-                    fontSize: 10,
-                    textColor: [255, 255, 255],
-                    lineColor: [200, 200, 200],
-                    lineWidth: 0.2,
-                    halign: 'center',
-                    valign: 'middle',
-                    fillColor: [0, 86, 179]
-                },
-                headStyles: {
-                    fillColor: [0, 86, 179]
-                },
-                alternateRowStyles: {
-                    fillColor: [240, 240, 240]
+            planosFiltrados.forEach(plano => {
+                doc.setTextColor("#000000"); // Define a cor do texto das linhas como preto
+                doc.text(`Cliente: ${plano.cliente}`, 10, startY);
+                doc.text(`Equipamentos: ${plano.equipamentos.join(', ')}`, 10, startY + 10);
+                doc.text(`Serviços: ${plano.servicos.join(', ')}`, 10, startY + 20);
+                doc.text(`Início: ${plano.vigencia_inicio} | Fim: ${plano.vigencia_fim}`, 10, startY + 30);
+                doc.text(`Frequência: ${plano.frequencia}`, 10, startY + 40);
+                startY += 50;
+                
+                if (startY > 270) {
+                    doc.addPage();
+                    startY = 20;
                 }
             });
 
