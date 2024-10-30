@@ -23,7 +23,7 @@
             background-color: #0056b3;
             padding: 20px;
             border-radius: 10px;
-border: 1px solid white;
+            border: 1px solid white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         .bottom-nav {
@@ -79,7 +79,7 @@ border: 1px solid white;
         }
         /* Estilo para o botão de download fixo no rodapé */
         .fixed-button {
-                     padding: 15px;
+            padding: 15px;
             font-size: 16px;
             border-radius: 5px;
             background-color: #fdd835;
@@ -118,12 +118,12 @@ border: 1px solid white;
         </div>
     </div>
 
- <div class="button-container">
-    <!-- Botão fixo para baixar a lista em PDF -->
-    <button class="fixed-button" onclick="generatePDF()">Baixar Lista de Clientes em PDF</button>
-</div>
+    <div class="button-container">
+        <!-- Botão fixo para baixar a lista em PDF -->
+        <button class="fixed-button" onclick="generatePDF()">Baixar Lista de Clientes em PDF</button>
+    </div>
 
- <div class="bottom-nav">
+    <div class="bottom-nav">
         <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
         <div class="menu-button">
             <button onclick="window.location.href='relatorios2.html'">MENU</button>
@@ -137,7 +137,7 @@ border: 1px solid white;
 
         function renderClientes() {
             clienteList.innerHTML = '';
-            clientes.forEach((cliente, index) => {
+            clientes.forEach(cliente => {
                 clienteList.innerHTML += `
                     <tr>
                         <td>${cliente.nome_cliente}</td>
@@ -167,6 +167,15 @@ border: 1px solid white;
 
             // Adiciona cada cliente à lista no PDF
             clientes.forEach(cliente => {
+                if (y > 280) { // Verifica se está próximo do final da página
+                    doc.addPage(); // Adiciona nova página se necessário
+                    y = 20; // Redefine a posição Y para o topo da nova página
+                    doc.text('Nome', 10, y);
+                    doc.text('Email', 60, y);
+                    doc.text('Telefone', 110, y);
+                    doc.text('Endereço', 160, y);
+                    y += 10;
+                }
                 doc.text(cliente.nome_cliente, 10, y);
                 doc.text(cliente.email_cliente, 60, y);
                 doc.text(cliente.telefone_cliente, 110, y);
@@ -176,7 +185,7 @@ border: 1px solid white;
 
             // Rodapé do PDF
             doc.setFontSize(10);
-            doc.text('Lista gerada automaticamente', 10, 290);  // Rodapé no final da página (Y = 290 para rodapé)
+            doc.text('Lista gerada automaticamente', 10, 290);
 
             // Baixar o PDF
             doc.save('lista-de-clientes.pdf');
