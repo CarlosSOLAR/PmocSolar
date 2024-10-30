@@ -1,235 +1,68 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordem de Serviço</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0056b3; /* Azul */
-            padding: 20px;
-            color: white; /* Cor do texto branco para contraste */
-            position: relative; /* Para posicionamento do botão fixo */
-            min-height: 100vh; /* Garante que o corpo ocupe pelo menos 100% da altura da tela */
-        }
-        h2 {
-            text-align: center;
-            color: white; /* Cor branca para o título */
-            font-size: 24px;
-        }
-        .filter-container {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #0056b3; /* Mesma cor de fundo azul */
-        }
-        .filter-options {
-            display: flex;
-            flex-direction: column; /* Alinha os filtros verticalmente */
-        }
-        .filter-options div {
-            margin-bottom: 15px; /* Espaço entre os filtros */
-        }
-        label {
-            display: block;
-            margin-bottom: 5px; /* Espaçamento entre a label e o select */
-            font-size: 14px;
-        }
-        select, input {
-            width: 100%; /* Ocupa toda a largura disponível */
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            color: #0056b3;
-        }
-        .scrollable {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px; /* Espaço entre a tabela e os filtros */
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        .download-container {
-            position: fixed;
-            bottom: 20px; /* Distância do fundo da página */
-            left: 50%;
-            transform: translateX(-50%); /* Centraliza o botão horizontalmente */
-        }
-        .download-btn {
-            background-color: #fdd835; /* Botão amarelo */
-            color: #0056b3; /* Texto azul escuro */
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .download-btn:hover {
-            background-color: #fbc02d; /* Efeito hover */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Geração de Ordem de Serviço PDF</title>
 </head>
 <body>
-    <h2>ORDEM DE SERVIÇO</h2>
+  <h1>Gerar Ordem de Serviço em PDF</h1>
+  <button onclick="gerarOrdemDeServicoPDF(dadosOrdem)">Gerar PDF</button>
 
-    <!-- Caixa de seleção para os filtros -->
-    <div class="filter-container">
-        <div class="filter-options">
-            <!-- Filtro de cliente -->
-            <div>
-                <label for="filtroCliente">Cliente:</label>
-                <select id="filtroCliente">
-                    <option value="">Todos os Clientes</option>
-                </select>
-            </div>
+  <!-- Inclui a biblioteca jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
-            <!-- Filtro de tipo de serviço -->
-            <div>
-                <label for="filtroServico">Tipo de Serviço:</label>
-                <select id="filtroServico">
-                    <option value="">Todos os Tipos de Serviço</option>
-                </select>
-            </div>
+  <script>
+    function gerarOrdemDeServicoPDF(dadosOrdem) {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'pt', 'a4');
 
-            <!-- Filtro de data inicial -->
-            <div>
-                <label for="filtroDataInicial">Data Inicial:</label>
-                <input type="date" id="filtroDataInicial">
-            </div>
+      pdf.setFont('Arial', 'normal');
+      pdf.setFillColor(0, 86, 179);
+      pdf.rect(0, 0, pdf.internal.pageSize.width, pdf.internal.pageSize.height, 'F');
+      pdf.setTextColor(255, 255, 255);
 
-            <!-- Filtro de data de conclusão -->
-            <div>
-                <label for="filtroDataConclusao">Data de Conclusão:</label>
-                <input type="date" id="filtroDataConclusao">
-            </div>
-        </div>
-    </div>
+      pdf.setFontSize(18);
+      pdf.text('Ordem de Serviço', pdf.internal.pageSize.width / 2, 50, { align: 'center' });
 
-    <div class="scrollable">
-        <table>
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Equipamento</th>
-                    <th>Tipo de Serviço</th>
-                    <th>Data Inicial</th>
-                    <th>Data de Conclusão</th>
-                </tr>
-            </thead>
-            <tbody id="osList"></tbody>
-        </table>
-    </div>
+      pdf.setFontSize(12);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(`Data: ${dadosOrdem.data}`, 40, 100);
+      pdf.text(`Cliente: ${dadosOrdem.cliente}`, 40, 130);
+      pdf.text(`Equipamento: ${dadosOrdem.equipamento}`, 40, 160);
+      pdf.text(`Descrição do Serviço: ${dadosOrdem.descricao}`, 40, 190);
+      pdf.text(`Status: ${dadosOrdem.status}`, 40, 220);
 
-    <!-- Contêiner para o botão de gerar PDF -->
-    <div class="download-container">
-        <button class="download-btn" id="downloadBtn">Gerar PDF</button>
-    </div>
+      const linhaInicial = 260;
+      pdf.setFontSize(10);
+      pdf.text('Serviço', 40, linhaInicial);
+      pdf.text('Quantidade', 200, linhaInicial);
+      pdf.text('Preço', 350, linhaInicial);
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        const { jsPDF } = window.jspdf;
+      dadosOrdem.itens.forEach((item, index) => {
+        const linhaY = linhaInicial + (index + 1) * 20;
+        pdf.text(item.servico, 40, linhaY);
+        pdf.text(item.quantidade.toString(), 200, linhaY);
+        pdf.text(`R$ ${item.preco}`, 350, linhaY);
+      });
 
-        const osList = document.getElementById('osList');
-        const filtroCliente = document.getElementById('filtroCliente');
-        const filtroServico = document.getElementById('filtroServico');
-        const filtroDataInicial = document.getElementById('filtroDataInicial');
-        const filtroDataConclusao = document.getElementById('filtroDataConclusao');
-        let ordens = JSON.parse(localStorage.getItem('ordens')) || [];
+      pdf.setFontSize(10);
+      pdf.text('Gerado automaticamente pelo sistema', pdf.internal.pageSize.width / 2, pdf.internal.pageSize.height - 30, { align: 'center' });
 
-        // Função para renderizar as ordens de serviço na tabela
-        function renderOrdens() {
-            const clienteFiltro = filtroCliente.value;
-            const servicoFiltro = filtroServico.value;
-            const dataInicialFiltro = filtroDataInicial.value;
-            const dataConclusaoFiltro = filtroDataConclusao.value;
+      pdf.save('Ordem_de_Servico.pdf');
+    }
 
-            // Filtrando por cliente, tipo de serviço e datas
-            const filteredOrdens = ordens.filter(o => 
-                (clienteFiltro ? o.cliente === clienteFiltro : true) &&
-                (servicoFiltro ? o.tipo_servico === servicoFiltro : true) &&
-                (dataInicialFiltro ? o.data_inicial >= dataInicialFiltro : true) &&
-                (dataConclusaoFiltro ? o.data_conclusao <= dataConclusaoFiltro : true)
-            );
-
-            osList.innerHTML = '';
-            filteredOrdens.forEach((ordem) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${ordem.cliente}</td>
-                    <td>${ordem.equipamento}</td>
-                    <td>${ordem.tipo_servico}</td>
-                    <td>${ordem.data_inicial}</td>
-                    <td>${ordem.data_conclusao}</td>
-                `;
-                osList.appendChild(row);
-            });
-        }
-
-        // Função para preencher o filtro de clientes
-        function populateFiltroClientes() {
-            const clientes = [...new Set(ordens.map(o => o.cliente))]; // Clientes únicos
-            filtroCliente.innerHTML = '<option value="">Todos os Clientes</option>';
-            clientes.forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente;
-                option.textContent = cliente;
-                filtroCliente.appendChild(option);
-            });
-        }
-
-        // Função para preencher o filtro de tipo de serviço
-        function populateFiltroServicos() {
-            const tiposServico = [...new Set(ordens.map(o => o.tipo_servico))]; // Tipos de serviço únicos
-            filtroServico.innerHTML = '<option value="">Todos os Tipos de Serviço</option>';
-            tiposServico.forEach(servico => {
-                const option = document.createElement('option');
-                option.value = servico;
-                option.textContent = servico;
-                filtroServico.appendChild(option);
-            });
-        }
-
-        // Função para gerar PDF
-        function generatePDF() {
-            const doc = new jsPDF();
-            doc.setFontSize(12);
-            doc.text("Ordem de Serviço", 20, 10);
-            doc.autoTable({ html: '#osList', startY: 20 });
-            doc.save('ordens_de_servico.pdf');
-        }
-
-        // Eventos para executar o filtro automaticamente ao selecionar cliente, tipo de serviço ou datas
-        filtroCliente.addEventListener('change', renderOrdens);
-        filtroServico.addEventListener('change', renderOrdens);
-        filtroDataInicial.addEventListener('change', renderOrdens);
-        filtroDataConclusao.addEventListener('change', renderOrdens);
-        
-        // Evento para gerar PDF ao clicar no botão
-        document.getElementById('downloadBtn').addEventListener('click', generatePDF);
-
-        // Carregar as ordens e preencher filtros ao carregar a página
-        window.onload = function() {
-            renderOrdens();
-            populateFiltroClientes();
-            populateFiltroServicos();
-        };
-    </script>
+    const dadosOrdem = {
+      data: '30/10/2024',
+      cliente: 'Cliente ABC',
+      equipamento: 'Máquina XYZ',
+      descricao: 'Manutenção preventiva',
+      status: 'Em andamento',
+      itens: [
+        { servico: 'Troca de óleo', quantidade: 1, preco: 50.00 },
+        { servico: 'Limpeza de filtro', quantidade: 1, preco: 30.00 },
+      ]
+    };
+  </script>
 </body>
 </html>
