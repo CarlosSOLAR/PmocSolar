@@ -19,10 +19,9 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-           background-color: #fff;
+            background-color: #fff;
             color: #0056b3;
             padding: 20px;
-           color: #0056b3; /* Cor do texto branco para contraste */
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
@@ -45,11 +44,9 @@
         .os-number {
             font-weight: bold;
             font-size: 18px;
-            background-color: #f3f3f3;
             padding: 10px;
-           color: #0056b3; /* Cor do texto branco para contraste */
+            color: #0056b3;
             border-radius: 5px;
-            border: 1px solid #ccc;
             margin-bottom: 20px;
             display: block;
             width: fit-content;
@@ -70,12 +67,12 @@
             padding: 5px;
             font-size: 16px;
             border-radius: 5px;
-            background-color: #fdd835; /* Fundo amarelo */
-            color: #0056b3; /* Texto azul escuro */
+            background-color: #fdd835;
+            color: #0056b3;
             border: none;
             cursor: pointer;
-            max-width: 150px; /* Ajuste na largura dos botões */
-            margin: 0 15px; /* Espaçamento horizontal entre os botões */
+            max-width: 150px;
+            margin: 0 15px;
         }
         .prev, .next {
             flex-grow: 1;
@@ -94,58 +91,79 @@
         .scrollable {
             max-height: 200px;
             overflow-y: auto;
-            overflow-x: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
             margin-top: 10px;
             border-radius: 5px;
+            border: 1px solid #ccc;
         }
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
         th, td {
             padding: 8px;
+            border: 1px solid #ccc;
             text-align: left;
         }
         th {
             background-color: #0056b3;
             color: white;
         }
-        .os-actions button {
-            margin-right: 10px;
-            margin-top: 10px;
+        .os-actions {
+            position: relative;
         }
-        .os-actions button.edit {
-            background-color: #007BFF; /* Cor azul para o botão de editar */
-            color: white;
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
         }
-        .os-actions button.delete {
-            background-color: #FF0000; /* Cor vermelha para o botão de excluir */
-            color: white;
+
+        .dropbtn {
+            background-color: #fdd835;
+            color: #0056b3;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
         }
-              /* Layout flexível para os campos lado a lado */
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 100px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 5px;
         }
-        .form-row div {
-            flex: 1;
+
+        .dropdown-content button {
+            color: #0056b3;
+            background-color: #ffffff;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            cursor: pointer;
         }
+
+        .dropdown-content button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
-        <h2>ORDEM DE SERVIÇO</h2>
-        <form id="osForm">
-    <div class="container">
+    <h2>ORDEM DE SERVIÇO</h2>
+    <form id="osForm">
+        <div class="container">
             <label for="os_numero">N° da OS</label>
-            <span id="os_numero" class="os-number"></span> <!-- Exibição do número da OS -->
+            <span id="os_numero" class="os-number"></span>
 
-              <div class="form-row">
+            <div class="form-row">
                 <div>
                     <label for="data_inicial">Data Inicial</label>
                     <input type="date" id="data_inicial" name="data_inicial" required>
@@ -186,13 +204,26 @@
             </select>
 
             <button type="submit">Cadastrar Ordem de Serviço</button>
-        </form>
-
-        <div class="scrollable">
-            <ul id="osList"></ul>
         </div>
+    </form>
+
+    <div class="scrollable">
+       <table id="osList">
+            <thead>
+                <tr>
+                    <th>N° OS</th>
+                    <th>Cliente</th>
+                    <th>Equipamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- As ordens de serviço serão renderizadas aqui -->
+            </tbody>
+        </table>
     </div>
-  <div class="bottom-nav">
+
+    <div class="bottom-nav">
         <button class="prev" onclick="window.location.href='plano-manutenção.html'">Voltar</button>
         <div class="menu-button">
             <button onclick="window.location.href='index.html'">MENU</button>
@@ -206,17 +237,14 @@
         const osNumeroDisplay = document.getElementById('os_numero');
         let ordens = JSON.parse(localStorage.getItem('ordens')) || [];
         let nextOSNumber = ordens.length > 0 ? Math.max(...ordens.map(o => parseInt(o.os_numero))) + 1 : 1;
-        let editIndex = null; // Para rastrear se estamos editando uma OS
+        let editIndex = null;
 
-        // Função para gerar o número da OS com 4 dígitos
         function generateOSNumber() {
             return String(nextOSNumber).padStart(4, '0');
         }
 
-        // Exibir o número da OS ao carregar a página
         osNumeroDisplay.textContent = generateOSNumber();
 
-        // Função para salvar a ordem de serviço
         function saveOrdem(e) {
             e.preventDefault();
 
@@ -231,42 +259,46 @@
                 metodo_correcao: document.getElementById('metodo_correcao').value,
                 pendencias: document.getElementById('pendencias').value
             };
-
             if (editIndex !== null) {
-                // Atualizar a ordem existente
-                ordens[editIndex] = ordem;
-                editIndex = null; // Resetar o modo de edição
+                ordens[editIndex] = ordem; // Edita a ordem existente
             } else {
-                // Adicionar nova ordem
-                ordens.push(ordem);
-                nextOSNumber++;
+                ordem.os_numero = generateOSNumber(); // Gera um novo número de OS
+                ordens.push(ordem); // Adiciona uma nova ordem
+                nextOSNumber++; // Incrementa o número da próxima OS
             }
 
             localStorage.setItem('ordens', JSON.stringify(ordens));
-
-            // Atualiza a lista de OS e o número da próxima ordem
-            renderOrdens();
-            osNumeroDisplay.textContent = generateOSNumber();
             osForm.reset();
+            editIndex = null;
+            osNumeroDisplay.textContent = generateOSNumber();
+            renderOrdens();
         }
 
-        // Função para renderizar as ordens de serviço cadastradas na página
         function renderOrdens() {
-            osList.innerHTML = '';
+            const tbody = osList.querySelector('tbody');
+            tbody.innerHTML = ''; // Limpa a tabela antes de renderizar
+
             ordens.forEach((ordem, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    OS: ${ordem.os_numero} - Cliente: ${ordem.cliente} - Equipamento: ${ordem.equipamento}
-                    <div class="os-actions">
-                        <button class="edit" onclick="editOrdem(${index})">Editar</button>
-                        <button class="delete" onclick="deleteOrdem(${index})">Excluir</button>
-                    </div>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${ordem.os_numero}</td>
+                    <td>${ordem.cliente}</td>
+                    <td>${ordem.equipamento}</td>
+                    <td class="os-actions">
+                        <div class="dropdown">
+                            <button class="dropbtn">Ações</button>
+                            <div class="dropdown-content">
+                                <button onclick="editOrdem(${index})">Editar</button>
+                                <button onclick="deleteOrdem(${index})">Deletar</button>
+                               <button onclick="downloadPDF(${index})">Imprimir</button>
+                            </div>
+                        </div>
+                    </td>
                 `;
-                osList.appendChild(li);
+                tbody.appendChild(tr);
             });
         }
 
-        // Função para editar uma ordem de serviço
         function editOrdem(index) {
             const ordem = ordens[index];
             document.getElementById('data_inicial').value = ordem.data_inicial;
@@ -278,24 +310,79 @@
             document.getElementById('metodo_correcao').value = ordem.metodo_correcao;
             document.getElementById('pendencias').value = ordem.pendencias;
 
-            // Atualizar o número da OS na interface
-            osNumeroDisplay.textContent = ordem.os_numero;
-
-            editIndex = index;
+            editIndex = index; // Armazena o índice para edição
+            osNumeroDisplay.textContent = ordem.os_numero; // Atualiza o número da OS no display
         }
 
-        // Função para excluir uma ordem de serviço
         function deleteOrdem(index) {
-            ordens.splice(index, 1);
-            localStorage.setItem('ordens', JSON.stringify(ordens));
-            renderOrdens();
-            osNumeroDisplay.textContent = generateOSNumber();
+            if (confirm('Tem certeza que deseja deletar esta ordem de serviço?')) {
+                ordens.splice(index, 1); // Remove a ordem do array
+                localStorage.setItem('ordens', JSON.stringify(ordens));
+                renderOrdens(); // Atualiza a tabela
+            }
         }
 
-        osForm.addEventListener('submit', saveOrdem);
+function downloadPDF(index) {
+            const ordem = ordens[index];
 
-        // Renderizar as ordens de serviço ao carregar a página
-        window.onload = renderOrdens;
+            const doc = new jsPDF();
+            doc.setFont("Arial");
+            doc.setFontSize(16);
+            doc.setTextColor(0, 86, 179); // Azul (#0056b3)
+
+            // Cabeçalho
+            doc.text("Ordem de Serviço", 105, 20, null, null, "center");
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0); // Texto preto para o conteúdo
+
+            // Número da OS e Cliente
+            doc.text(`N° da OS: ${ordem.os_numero}`, 20, 40);
+            doc.text(`Cliente: ${ordem.cliente}`, 20, 50);
+            doc.text(`Equipamento: ${ordem.equipamento}`, 20, 60);
+
+            // Datas
+            doc.text(`Data Inicial: ${ordem.data_inicial}`, 20, 70);
+            doc.text(`Data de Conclusão: ${ordem.data_conclusao}`, 20, 80);
+
+            // Tipo de Serviço
+            doc.text(`Tipo de Serviço: ${ordem.tipo_servico}`, 20, 90);
+
+            // Descrição do Problema
+            doc.setFontSize(12);
+            doc.setTextColor(0, 86, 179); // Azul para os títulos das seções
+            doc.text("Descrição do Problema:", 20, 100);
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0); // Preto para o texto do conteúdo
+            doc.text(ordem.descricao_problema, 20, 110, { maxWidth: 170 });
+
+            // Método de Correção
+            doc.setFontSize(12);
+            doc.setTextColor(0, 86, 179);
+            doc.text("Método de Correção:", 20, 130);
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text(ordem.metodo_correcao, 20, 140, { maxWidth: 170 });
+
+            // Pendências
+            doc.setFontSize(12);
+            doc.setTextColor(0, 86, 179);
+            doc.text("Pendências:", 20, 160);
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text(ordem.pendencias, 20, 170);
+
+            // Salva o PDF
+            doc.save(`Ordem_Servico_${ordem.os_numero}.pdf`);
+        }
+        
+      osForm.addEventListener('submit', saveOrdem);
+        document.addEventListener('DOMContentLoaded', renderOrdens);
+        
+    </script>
+
+    <!-- Inclua a biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
     </script>
 </body>
 </html>
