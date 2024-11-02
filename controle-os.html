@@ -323,57 +323,42 @@
         }
 
 function downloadPDF(index) {
-            const ordem = ordens[index];
+    const ordem = ordens[index];
 
-            const doc = new jsPDF();
-            doc.setFont("Arial");
-            doc.setFontSize(16);
-            doc.setTextColor(0, 86, 179); // Azul (#0056b3)
+    const doc = new jsPDF();
+    doc.setFont("Arial");
+    doc.setFontSize(16);
+    doc.setTextColor(0, 86, 179); // Azul (#0056b3)
 
-            // Cabeçalho
-            doc.text("Ordem de Serviço", 105, 20, null, null, "center");
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0); // Texto preto para o conteúdo
+    // Cabeçalho
+    doc.text("Ordem de Serviço", 105, 20, null, null, "center");
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0); // Texto preto para o conteúdo
 
-            // Número da OS e Cliente
-            doc.text(`N° da OS: ${ordem.os_numero}`, 20, 40);
-            doc.text(`Cliente: ${ordem.cliente}`, 20, 50);
-            doc.text(`Equipamento: ${ordem.equipamento}`, 20, 60);
+    // Informações principais
+    doc.text(`N° da OS: ${ordem.os_numero}`, 20, 40);
+    doc.text(`Cliente: ${ordem.cliente}`, 20, 50);
+    doc.text(`Equipamento: ${ordem.equipamento}`, 20, 60);
+    doc.text(`Data Inicial: ${ordem.data_inicial}`, 20, 70);
+    doc.text(`Data de Conclusão: ${ordem.data_conclusao}`, 20, 80);
+    doc.text(`Tipo de Serviço: ${ordem.tipo_servico}`, 20, 90);
 
-            // Datas
-            doc.text(`Data Inicial: ${ordem.data_inicial}`, 20, 70);
-            doc.text(`Data de Conclusão: ${ordem.data_conclusao}`, 20, 80);
+    // Descrição do problema e método de correção
+    doc.text("Descrição do Problema:", 20, 110);
+    doc.text(ordem.descricao_problema, 20, 120, { maxWidth: 170 });
 
-            // Tipo de Serviço
-            doc.text(`Tipo de Serviço: ${ordem.tipo_servico}`, 20, 90);
+    doc.text("Método de Correção:", 20, 140);
+    doc.text(ordem.metodo_correcao, 20, 150, { maxWidth: 170 });
 
-            // Descrição do Problema
-            doc.setFontSize(12);
-            doc.setTextColor(0, 86, 179); // Azul para os títulos das seções
-            doc.text("Descrição do Problema:", 20, 100);
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0); // Preto para o texto do conteúdo
-            doc.text(ordem.descricao_problema, 20, 110, { maxWidth: 170 });
+    // Pendências
+    doc.text(`Pendências: ${ordem.pendencias}`, 20, 170);
 
-            // Método de Correção
-            doc.setFontSize(12);
-            doc.setTextColor(0, 86, 179);
-            doc.text("Método de Correção:", 20, 130);
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0);
-            doc.text(ordem.metodo_correcao, 20, 140, { maxWidth: 170 });
-
-            // Pendências
-            doc.setFontSize(12);
-            doc.setTextColor(0, 86, 179);
-            doc.text("Pendências:", 20, 160);
-            doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0);
-            doc.text(ordem.pendencias, 20, 170);
-
-            // Salva o PDF
-            doc.save(`Ordem_Servico_${ordem.os_numero}.pdf`);
-        }
+    // Nome do arquivo para download
+    const fileName = `Ordem_Servico_${ordem.os_numero}.pdf`;
+    
+    // Baixar o PDF
+    doc.save(fileName);
+}
         
       osForm.addEventListener('submit', saveOrdem);
         document.addEventListener('DOMContentLoaded', renderOrdens);
