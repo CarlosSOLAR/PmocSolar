@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordem de Serviço</title>
+  <!-- Inclua a biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -204,8 +206,7 @@
             </select>
 
             <button type="submit">Cadastrar Ordem de Serviço</button>
-        </div>
-    </form>
+
 
     <div class="scrollable">
        <table id="osList">
@@ -363,10 +364,9 @@ function downloadPDF(index) {
       osForm.addEventListener('submit', saveOrdem);
         document.addEventListener('DOMContentLoaded', renderOrdens);
         
-    </script>
+    
 
-    <!-- Inclua a biblioteca jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  
 
     </script>
 </body>
