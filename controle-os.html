@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ordem de Serviço</title>
-  <!-- Inclua a biblioteca jsPDF -->
+    <!-- Inclua a biblioteca jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <style>
         body {
@@ -15,7 +15,7 @@
         }
         h2 {
             text-align: center;
-            color: white; /* Cor branca para o título */
+            color: white;
             font-size: 24px;
         }
         .container {
@@ -113,12 +113,10 @@
         .os-actions {
             position: relative;
         }
-
         .dropdown {
             position: relative;
             display: inline-block;
         }
-
         .dropbtn {
             background-color: #fdd835;
             color: #0056b3;
@@ -127,7 +125,6 @@
             cursor: pointer;
             border-radius: 5px;
         }
-
         .dropdown-content {
             display: none;
             position: absolute;
@@ -137,7 +134,6 @@
             z-index: 1;
             border-radius: 5px;
         }
-
         .dropdown-content button {
             color: #0056b3;
             background-color: #ffffff;
@@ -147,15 +143,12 @@
             text-align: left;
             cursor: pointer;
         }
-
         .dropdown-content button:hover {
             background-color: #f0f0f0;
         }
-
         .dropdown:hover .dropdown-content {
             display: block;
         }
-
     </style>
 </head>
 <body>
@@ -165,27 +158,17 @@
             <label for="os_numero">N° da OS</label>
             <span id="os_numero" class="os-number"></span>
 
-            <div class="form-row">
-                <div>
-                    <label for="data_inicial">Data Inicial</label>
-                    <input type="date" id="data_inicial" name="data_inicial" required>
-                </div>
-                <div>
-                    <label for="data_conclusao">Data de Conclusão</label>
-                    <input type="date" id="data_conclusao" name="data_conclusao" required>
-                </div>
-            </div>
+            <label for="data_inicial">Data Inicial</label>
+            <input type="date" id="data_inicial" name="data_inicial" required>
 
-            <div class="form-row">
-                <div>
-                    <label for="cliente">Cliente</label>
-                    <input type="text" id="cliente" name="cliente" required>
-                </div>
-                <div>
-                    <label for="equipamento">Equipamento</label>
-                    <input type="text" id="equipamento" name="equipamento" required>
-                </div>
-            </div>
+            <label for="data_conclusao">Data de Conclusão</label>
+            <input type="date" id="data_conclusao" name="data_conclusao" required>
+
+            <label for="cliente">Cliente</label>
+            <input type="text" id="cliente" name="cliente" required>
+
+            <label for="equipamento">Equipamento</label>
+            <input type="text" id="equipamento" name="equipamento" required>
 
             <label for="tipo_servico">Tipo de Serviço</label>
             <select id="tipo_servico" name="tipo_servico" required>
@@ -206,10 +189,10 @@
             </select>
 
             <button type="submit">Cadastrar Ordem de Serviço</button>
-
+ 
 
     <div class="scrollable">
-       <table id="osList">
+        <table id="osList">
             <thead>
                 <tr>
                     <th>N° OS</th>
@@ -254,49 +237,47 @@
                 data_inicial: document.getElementById('data_inicial').value,
                 data_conclusao: document.getElementById('data_conclusao').value,
                 tipo_servico: document.getElementById('tipo_servico').value,
-                equipamento: document.getElementById('equipamento').value,
+  equipamento: document.getElementById('equipamento').value,
                 cliente: document.getElementById('cliente').value,
                 descricao_problema: document.getElementById('descricao_problema').value,
                 metodo_correcao: document.getElementById('metodo_correcao').value,
                 pendencias: document.getElementById('pendencias').value
             };
+
             if (editIndex !== null) {
-                ordens[editIndex] = ordem; // Edita a ordem existente
+                ordens[editIndex] = ordem;
+                editIndex = null;
             } else {
-                ordem.os_numero = generateOSNumber(); // Gera um novo número de OS
-                ordens.push(ordem); // Adiciona uma nova ordem
-                nextOSNumber++; // Incrementa o número da próxima OS
+                ordens.push(ordem);
+                nextOSNumber++;
             }
 
             localStorage.setItem('ordens', JSON.stringify(ordens));
             osForm.reset();
-            editIndex = null;
             osNumeroDisplay.textContent = generateOSNumber();
             renderOrdens();
         }
 
         function renderOrdens() {
-            const tbody = osList.querySelector('tbody');
-            tbody.innerHTML = ''; // Limpa a tabela antes de renderizar
-
+            osList.querySelector('tbody').innerHTML = '';
             ordens.forEach((ordem, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td>${ordem.os_numero}</td>
                     <td>${ordem.cliente}</td>
                     <td>${ordem.equipamento}</td>
-                    <td class="os-actions">
+                    <td>
                         <div class="dropdown">
                             <button class="dropbtn">Ações</button>
                             <div class="dropdown-content">
                                 <button onclick="editOrdem(${index})">Editar</button>
-                                <button onclick="deleteOrdem(${index})">Deletar</button>
-                               <button onclick="downloadPDF(${index})">Imprimir</button>
+                                <button onclick="deleteOrdem(${index})">Excluir</button>
+                                <button onclick="generatePDF(${index})">Baixar PDF</button>
                             </div>
                         </div>
                     </td>
                 `;
-                tbody.appendChild(tr);
+                osList.querySelector('tbody').appendChild(row);
             });
         }
 
@@ -304,70 +285,48 @@
             const ordem = ordens[index];
             document.getElementById('data_inicial').value = ordem.data_inicial;
             document.getElementById('data_conclusao').value = ordem.data_conclusao;
-            document.getElementById('tipo_servico').value = ordem.tipo_servico;
-            document.getElementById('equipamento').value = ordem.equipamento;
             document.getElementById('cliente').value = ordem.cliente;
+            document.getElementById('equipamento').value = ordem.equipamento;
+            document.getElementById('tipo_servico').value = ordem.tipo_servico;
             document.getElementById('descricao_problema').value = ordem.descricao_problema;
             document.getElementById('metodo_correcao').value = ordem.metodo_correcao;
             document.getElementById('pendencias').value = ordem.pendencias;
 
-            editIndex = index; // Armazena o índice para edição
-            osNumeroDisplay.textContent = ordem.os_numero; // Atualiza o número da OS no display
+            editIndex = index;
+            osNumeroDisplay.textContent = ordem.os_numero;
         }
 
         function deleteOrdem(index) {
-            if (confirm('Tem certeza que deseja deletar esta ordem de serviço?')) {
-                ordens.splice(index, 1); // Remove a ordem do array
-                localStorage.setItem('ordens', JSON.stringify(ordens));
-                renderOrdens(); // Atualiza a tabela
-            }
+            ordens.splice(index, 1);
+            localStorage.setItem('ordens', JSON.stringify(ordens));
+            renderOrdens();
         }
 
-function downloadPDF(index) {
-    const ordem = ordens[index];
+        function generatePDF(index) {
+            const ordem = ordens[index];
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
-    const doc = new jsPDF();
-    doc.setFont("Arial");
-    doc.setFontSize(16);
-    doc.setTextColor(0, 86, 179); // Azul (#0056b3)
+            doc.setFontSize(20);
+            doc.text("Ordem de Serviço", 20, 20);
+            doc.setFontSize(12);
+            doc.text(`N° da OS: ${ordem.os_numero}`, 20, 40);
+            doc.text(`Data Inicial: ${ordem.data_inicial}`, 20, 50);
+            doc.text(`Data de Conclusão: ${ordem.data_conclusao}`, 20, 60);
+            doc.text(`Cliente: ${ordem.cliente}`, 20, 70);
+            doc.text(`Equipamento: ${ordem.equipamento}`, 20, 80);
+            doc.text(`Tipo de Serviço: ${ordem.tipo_servico}`, 20, 90);
+            doc.text("Descrição do Problema:", 20, 100);
+            doc.text(ordem.descricao_problema, 20, 110, { maxWidth: 170 });
+            doc.text("Método de Correção:", 20, 130);
+            doc.text(ordem.metodo_correcao, 20, 140, { maxWidth: 170 });
+            doc.text(`Pendências: ${ordem.pendencias}`, 20, 160);
 
-    // Cabeçalho
-    doc.text("Ordem de Serviço", 105, 20, null, null, "center");
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0); // Texto preto para o conteúdo
+            doc.save(`Ordem_de_Servico_${ordem.os_numero}.pdf`);
+        }
 
-    // Informações principais
-    doc.text(`N° da OS: ${ordem.os_numero}`, 20, 40);
-    doc.text(`Cliente: ${ordem.cliente}`, 20, 50);
-    doc.text(`Equipamento: ${ordem.equipamento}`, 20, 60);
-    doc.text(`Data Inicial: ${ordem.data_inicial}`, 20, 70);
-    doc.text(`Data de Conclusão: ${ordem.data_conclusao}`, 20, 80);
-    doc.text(`Tipo de Serviço: ${ordem.tipo_servico}`, 20, 90);
-
-    // Descrição do problema e método de correção
-    doc.text("Descrição do Problema:", 20, 110);
-    doc.text(ordem.descricao_problema, 20, 120, { maxWidth: 170 });
-
-    doc.text("Método de Correção:", 20, 140);
-    doc.text(ordem.metodo_correcao, 20, 150, { maxWidth: 170 });
-
-    // Pendências
-    doc.text(`Pendências: ${ordem.pendencias}`, 20, 170);
-
-    // Nome do arquivo para download
-    const fileName = `Ordem_Servico_${ordem.os_numero}.pdf`;
-    
-    // Baixar o PDF
-    doc.save(fileName);
-}
-        
-      osForm.addEventListener('submit', saveOrdem);
+        osForm.addEventListener('submit', saveOrdem);
         document.addEventListener('DOMContentLoaded', renderOrdens);
-        
-    
-
-  
-
     </script>
 </body>
-        </html>
+</html>
