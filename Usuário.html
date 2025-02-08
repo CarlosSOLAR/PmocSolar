@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Login</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        /* Centraliza o contêiner */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: var(--logo-width, 150px);
+            margin: 0 auto 20px auto;
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+            max-height: var(--logo-height, 150px);
+        }
+
+        .footer {
+            background-color: var(--footer-background, #ddd);
+            color: var(--footer-text-color, #333);
+            padding: var(--footer-padding, 10px);
+            text-align: center;
+            font-size: var(--footer-font-size, 14px);
+            margin-top: 20px;
+        }
+
+        /* Estilos para o modal de recuperação de senha */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: blue;
+        }
+
+        .close:hover {
+            color: #007BFF;
+        }
+
+        /* Mensagens de erro/sucesso */
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+  <div class="header">
+        <h1> Solar Refrigeração e Energia</h1>
+    </div>
+<div class="container">
+    <!-- Logo -->
+    <div class="logo">
+        <img id="logo-img" src="" alt="Logo do Sistema">
+    </div>
+
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Usuário" required>
+        <input type="password" id="password" placeholder="Senha" required>
+        <button type="button" onclick="login()">Entrar</button>
+        <p id="message" class="message"></p>
+        <p><a href="#" onclick="showRecoverPassword()">Esqueci minha senha</a></p>
+    </form>
+</div>
+
+
+<!-- Rodapé -->
+<div class="footer">
+    <p id="footerText">&copy; 2025 Sua Empresa. Todos os direitos reservados.</p>
+</div>
+
+<!-- Modal de Recuperação de Senha -->
+<div id="recoverPasswordModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeRecoverPassword()">&times;</span>
+        <h2>Recuperar Senha</h2>
+        <form id="recoverPasswordForm">
+            <input type="text" id="recoverUsername" placeholder="Usuário" required>
+            <input type="email" id="recoverEmail" placeholder="E-mail" required>
+            <button type="button" onclick="recoverPassword()">Recuperar Senha</button>
+            <p id="recoverMessage" class="message"></p>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+<script>
+      // Carrega as variáveis salvas no localStorage
+    function loadVariables() {
+        const root = document.documentElement;
+
+        // Carregar a logo e definir no <img>
+        const logoUrl = localStorage.getItem('logoUrl');
+        if (logoUrl) {
+            document.getElementById('logo-img').src = logoUrl;
+        }
+
+        // Configurações do rodapé
+        const footerBackground = localStorage.getItem('footerBackground');
+        const footerTextColor = localStorage.getItem('footerTextColor');
+        const footerPadding = localStorage.getItem('footerPadding');
+        const footerFontSize = localStorage.getItem('footerFontSize');
+        const footerText = localStorage.getItem('footerText');
+
+        // Aplica as variáveis CSS
+        if (footerBackground) root.style.setProperty('--footer-background', footerBackground);
+        if (footerTextColor) root.style.setProperty('--footer-text-color', footerTextColor);
+        if (footerPadding) root.style.setProperty('--footer-padding', footerPadding);
+        if (footerFontSize) root.style.setProperty('--footer-font-size', footerFontSize);
+
+        // Atualiza o texto do rodapé
+        if (footerText) {
+            document.getElementById('footerText').innerText = footerText;
+        }
+    }
+
+    // Carrega as variáveis ao carregar a página
+    window.onload = loadVariables;
+
+    function showRecoverPassword() {
+        document.getElementById('recoverPasswordModal').style.display = 'flex';
+    }
+
+    function closeRecoverPassword() {
+        document.getElementById('recoverPasswordModal').style.display = 'none';
+    }
+
+    function recoverPassword() {
+        const recoverUsername = document.getElementById('recoverUsername').value;
+        const recoverEmail = document.getElementById('recoverEmail').value;
+
+        if (!recoverUsername || !recoverEmail) {
+            showRecoverMessage("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const encryptedUsername = CryptoJS.SHA256(recoverUsername).toString();
+
+        const user = users.find(user => user.username === encryptedUsername && user.email === recoverEmail);
+
+        if (user) {
+            const tempPassword = Math.random().toString(36).slice(-8);
+            user.password = CryptoJS.SHA256(tempPassword).toString();
+            localStorage.setItem('users', JSON.stringify(users));
+
+            document.getElementById('password').value = tempPassword;
+            showRecoverMessage(`Senha temporária gerada: ${tempPassword}`);
+
+            setTimeout(() => {
+                closeRecoverPassword();
+            }, 3000);
+        } else {
+            showRecoverMessage("Usuário ou e-mail incorretos.");
+        }
+    }
+
+    function showRecoverMessage(msg) {
+        const recoverMessageElement = document.getElementById('recoverMessage');
+        recoverMessageElement.innerText = msg;
+        setTimeout(() => {
+            recoverMessageElement.innerText = '';
+        }, 3000);
+    }
+
+    function login() {
+        const usernameInput = document.getElementById('username').value;
+        const passwordInput = document.getElementById('password').value;
+
+        if (!usernameInput || !passwordInput) {
+            showMessage("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const encryptedUsername = CryptoJS.SHA256(usernameInput).toString();
+        const encryptedPassword = CryptoJS.SHA256(passwordInput).toString();
+
+        const user = users.find(user => user.username === encryptedUsername && user.password === encryptedPassword);
+
+        if (user) {
+            window.location.href = "index.html";
+        } else {
+            showMessage("Usuário ou senha incorretos.");
+        }
+    }
+
+    function showMessage(msg) {
+        const messageElement = document.getElementById('message');
+        messageElement.innerText = msg;
+        setTimeout(() => {
+            messageElement.innerText = '';
+        }, 3000);
+    }
+</script>
+</body>
+</html>
