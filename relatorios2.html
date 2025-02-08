@@ -1,105 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RELATÓRIOS</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0056b3; /* Azul */
-            padding: 20px;
-            color: white; /* Cor do texto branco para contraste */
-        }
-        h1 {
-            text-align: center;
-            color: white; /* Cor branca para o título */
-            font-size: 24px;
-        }
-        #data-hora {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: white; /* Cor branca para o texto de data e hora */
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff; /* Fundo branco para a área de botões principais */
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            background-color: #fdd835; /* Amarelo */
-            color: #0056b3; /* Azul escuro */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #fbc02d; /* Amarelo mais escuro */
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #0056b3; /* Mesma cor de fundo azul */
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .bottom-nav button {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            background-color: #fdd835; /* Fundo amarelo */
-            color: #0056b3; /* Texto azul escuro */
-            border: none;
-            cursor: pointer;
-            max-width: 150px; /* Ajuste na largura dos botões */
-            margin: 0 15px; /* Espaçamento horizontal entre os botões */
-        }
-        .bottom-nav button:hover {
-            background-color: #fbc02d; /* Amarelo mais escuro no hover */
-        }
-        .prev, .next {
-            flex-grow: 1;
-            text-align: center;
-        }
-        .menu-button {
-            flex-grow: 2;
-            text-align: center;
-        }
-        .menu-button button {
-            max-width: 180px; /* Largura ligeiramente maior para o botão do menu */
-            margin: 0 auto;
-        }
-    </style>
+    <link rel="stylesheet" href="global.css">
 </head>
 <body>
+   <!-- Cabeçalho com logo -->
+    <div class="header">
+        <div class="logo-header">
+            <img id="logo-img" src="" alt="Logo do Sistema">
+        </div>
+        <h1>RELATÓRIOS</h1>
+        <div id="data-hora"></div>
+               <div class="dropdownid">
+            <button class="dropbtnid">≡</button>
+            <div class="dropdownid-content">
+                <a href="EditarPDF.html">EditarPDF</a>
+                <a href="EditarGRAFICO.html">EditarGRAFICO</a>
 
-    <h1>RELATÓRIOS</h1>
-    <div id="data-hora"></div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <button onclick="window.location.href='Relclientes.html'">Relatórios de Clientes</button>
         <button onclick="window.location.href='Relservicos.html'">Relatórios de Serviços</button>
-        <button onclick="window.location.href='Relequipamento.html'"> Relatórios de Equipamentos</button>
-        <button onclick="window.location.href='Relplanos.html'"> Relatórios de Planos de Manuteçao</button>
-        <button onclick="window.location.href='Relordem.html'"> Relatórios de Ordem de Serviço</button>
+        <button onclick="window.location.href='Relequipamento.html'">Relatórios de Equipamentos</button>
+        <button onclick="window.location.href='Relplanos.html'">Relatórios de Planos de Manutenção</button>
+        <button onclick="window.location.href='Relordem.html'">Relatórios de Ordem de Serviço</button>
         <button onclick="window.location.href='Relchecklist.html'">Relatório de Checklists</button>
         <button onclick="window.location.href='Relalmoxarifado.html'">Relatórios Almoxarifado</button>
+        <button onclick="window.location.href='Relfaturamento.html'">Relatório de Faturamento</button>
+    </div>
 
-        <button onclick="window.location.href='Relfaturamento.html'">Relatorio de Faturamento</button>
+    <!-- Rodapé -->
+    <div class="footer">
+        <p id="footerText">&copy; 2025 Sua Empresa. Todos os direitos reservados.</p>
     </div>
 
     <div class="bottom-nav">
@@ -111,6 +50,41 @@
     </div>
 
     <script>
+      
+              // Função para carregar as configurações de logo e rodapé do localStorage
+        function loadSettings() {
+            const root = document.documentElement;
+
+            // Carregar a logo
+            const logoUrl = localStorage.getItem('logoUrl');
+            if (logoUrl) {
+                document.getElementById('logo-img').src = logoUrl;
+            }
+
+            // Configurações de dimensionamento da logo
+            const logoWidth = localStorage.getItem('logoWidth');
+            const logoHeight = localStorage.getItem('logoHeight');
+            if (logoWidth) root.style.setProperty('--logo-width', logoWidth);
+            if (logoHeight) root.style.setProperty('--logo-height', logoHeight);
+
+            // Configurações do rodapé
+            const footerBackground = localStorage.getItem('footerBackground');
+            const footerTextColor = localStorage.getItem('footerTextColor');
+            const footerPadding = localStorage.getItem('footerPadding');
+            const footerFontSize = localStorage.getItem('footerFontSize');
+            const footerText = localStorage.getItem('footerText');
+
+            if (footerBackground) root.style.setProperty('--footer-background', footerBackground);
+            if (footerTextColor) root.style.setProperty('--footer-text-color', footerTextColor);
+            if (footerPadding) root.style.setProperty('--footer-padding', footerPadding);
+            if (footerFontSize) root.style.setProperty('--footer-font-size', footerFontSize);
+
+            // Atualiza o texto do rodapé
+            if (footerText) {
+                document.getElementById('footerText').innerText = footerText;
+            }
+        }
+      
         function atualizarDataHora() {
             const dataHora = new Date();
             const dataFormatada = dataHora.toLocaleDateString('pt-BR', {
@@ -124,8 +98,13 @@
             });
             document.getElementById('data-hora').textContent = `${dataFormatada} ${horaFormatada}`;
         }
-        // Atualiza a data e hora ao carregar a página
-        window.onload = atualizarDataHora;
+      // Carrega as configurações e atualiza a data/hora ao carregar a página
+        window.onload = function () {
+            loadSettings();
+            atualizarDataHora();
+            setInterval(atualizarDataHora, 60000); // Atualiza a cada minuto
+        };
     </script>
 </body>
+
 </html>
