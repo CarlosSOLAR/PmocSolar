@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperação de Conta</title>
+    <!-- Link para o arquivo CSS global -->
+    <link rel="stylesheet" href="global.css">
+    <!-- Script externo para criptografia -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Recuperação de Conta</h2>
+        <form id="recoverForm">
+            <input type="text" id="username" placeholder="Usuário" required>
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="newPassword" placeholder="Nova Senha" required>
+            <button type="submit">Redefinir Senha</button>
+        </form>
+        <p id="message" class="message"></p>
+    </div>
+
+    <script>
+        const recoverForm = document.getElementById('recoverForm');
+        const message = document.getElementById('message');
+
+        // Função de hash para a senha (SHA-256)
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Gera uma "sal" aleatória para cada usuário
+        function generateSalt() {
+            return CryptoJS.lib.WordArray.random(128 / 8).toString();
+        }
+
+        // Deriva a chave de criptografia com username e sal
+        function deriveKey(username, salt) {
+            return CryptoJS.PBKDF2(username, salt, { keySize: 256 / 32, iterations: 1000 }).toString();
+        }
+
+        // Função para criptografar dados com CryptoJS usando uma chave derivada
+        function encryptData(data, key) {
+            return CryptoJS.AES.encrypt(data, key).toString();
+        }
+
+        // Função para recuperação de conta
+        recoverForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            // Verifica se o usuário existe no localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userIndex = users.findIndex(user => user.username === username);
+
+            if (userIndex === -1) {
+                message.textContent = 'Usuário não encontrado.';
+                return;
+            }
+
+            const user = users[userIndex];
+
+            // Deriva a chave para desencriptar o email e verificar se é válido
+            const derivedKey = deriveKey(username, user.salt);
+            const decryptedEmail = CryptoJS.AES.decrypt(user.email, derivedKey).toString(CryptoJS.enc.Utf8);
+
+            if (decryptedEmail !== email) {
+                message.textContent = 'E-mail não corresponde ao cadastrado.';
+                return;
+            }
+
+            // Se o e-mail for válido, redefine a senha
+            const hashedPassword = await hashPassword(newPassword);
+
+            // Gera uma nova sal e chave de criptografia para os dados atualizados
+            const newSalt = generateSalt();
+            const newDerivedKey = deriveKey(username, newSalt);
+
+            // Atualiza os dados do usuário com nova senha e chave derivada
+            users[userIndex] = {
+                ...user,
+                password: hashedPassword,
+                salt: newSalt,
+                email: encryptData(email, newDerivedKey),
+                phone: encryptData(CryptoJS.AES.decrypt(user.phone, derivedKey).toString(CryptoJS.enc.Utf8), newDerivedKey)
+            };
+
+            localStorage.setItem('users', JSON.stringify(users));
+
+            message.textContent = 'Senha redefinida com sucesso!';
+            recoverForm.reset();
+        });
+    </script>
+
+</body>
+</html>
