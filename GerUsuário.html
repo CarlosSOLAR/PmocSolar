@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Usuários</title>
+    <link rel="stylesheet" href="global.css"> <!-- Link para o global.css -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
+<body>
+    <div class="header">
+      
+  <span class="close-btn" onclick="closePage()">&times;</span>
+      
+        <h1>GERENCIAMENTO DE USUÁRIOS</h1>
+    </div>
+    <div class="container">
+        <h2>Cadastrar e Gerenciar Usuários</h2>
+
+        <!-- Formulário de Cadastro -->
+        <div class="form-group">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Celular:</label>
+            <input type="text" id="phone" required>
+        </div>
+        <div class="form-group">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Senha:</label>
+            <input type="password" id="password" required>
+        </div>
+        <button onclick="addUser()">Cadastrar Usuário</button>
+
+        <!-- Tabela de Usuários -->
+        <div class="scrollable">
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Celular</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Mensagem de Feedback -->
+        <p id="message" class="message"></p>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
+        <div class="menu-button">
+            <button onclick="window.location.href='relatorios2.html'">MENU</button>
+        </div>
+        <button class="next" onclick="window.location.href='index.html'">Avançar</button>
+    </div>
+
+    <script>
+        const userTable = document.querySelector('#userTable tbody');
+        let editIndex = -1;
+
+        // Função para adicionar ou editar um usuário
+        function addUser() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (name && email && phone && username && password) {
+                const encryptedUser = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    username: CryptoJS.SHA256(username).toString(),
+                    password: CryptoJS.SHA256(password).toString()
+                };
+
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                if (editIndex >= 0) {
+                    users[editIndex] = encryptedUser;
+                    editIndex = -1;
+                    showMessage('Usuário atualizado com sucesso!');
+                } else {
+                    users.push(encryptedUser);
+                    showMessage('Usuário cadastrado com sucesso!');
+                }
+
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUsers();
+                clearInputFields();
+            } else {
+                showMessage('Preencha todos os campos!');
+            }
+        }
+
+        // Função para carregar os usuários na tabela
+        function loadUsers() {
+            userTable.innerHTML = '';
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>
+                        <div class="dropdown">
+                            <span class="arrow">▼</span>
+                            <div class="dropdown-content">
+                                <a href="#" class="edit" onclick="editUser(${index})">Editar</a>
+                                <a href="#" class="delete" onclick="deleteUser(${index})">Excluir</a>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                userTable.appendChild(row);
+            });
+        }
+
+        // Função para editar um usuário
+        function editUser(index) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users[index];
+
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone;
+            document.getElementById('username').value = ''; // Não exibe o username criptografado
+            document.getElementById('password').value = ''; // Não exibe a senha criptografada
+            editIndex = index;
+            showMessage(`Editando usuário: ${user.name}`);
+        }
+
+        // Função para excluir um usuário
+        function deleteUser(index) {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            showMessage('Usuário excluído com sucesso!');
+            loadUsers();
+        }
+
+        // Função para limpar os campos do formulário
+        function clearInputFields() {
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Função para exibir mensagens de feedback
+        function showMessage(msg) {
+            const messageElement = document.getElementById('message');
+            messageElement.innerText = msg;
+            setTimeout(() => {
+                messageElement.innerText = '';
+            }, 3000);
+        }
+
+   // Função para fechar a página e redirecionar para index.html
+    function closePage() {
+        window.location.href = 'index.html';
+    }
+
+        // Carregar os usuários ao iniciar a página
+        window.onload = () => {
+            loadUsers();
+        };
+    </script>
+</body>
+</html>
