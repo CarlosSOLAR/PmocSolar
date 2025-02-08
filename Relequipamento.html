@@ -3,124 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Equipamentos</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0056b3; /* Azul */
-            padding: 20px;
-            color: white; /* Cor do texto branco para contraste */
-            position: relative; /* Para o posicionamento do botão */
-            min-height: 100vh; /* Para garantir que o corpo da página tenha altura mínima */
-        }
-        h2 {
-            text-align: center;
-            color: white; /* Cor branca para o título */
-            font-size: 24px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #0056b3;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-border: 1px solid white;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid white;
-            border-radius: 5px;
-            box-sizing: border-box;
-            color: black; /* Texto preto no select */
-        }
-        .scrollable {
-            max-height: 400px;
-            overflow-y: auto;
-            overflow-x: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #0056b3;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .bottom-nav button {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            background-color: #fdd835;
-            color: #0056b3;
-            border: none;
-            cursor: pointer;
-            width: 150px;
-            margin: 0 15px;
-        }
-        .bottom-nav button:hover {
-            background-color: #fbc02d;
-        }
-        .menu-button {
-            text-align: center;
-            flex-grow: 2;
-        }
-        .menu-button button {
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        .download-btn {
-           padding: 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            background-color: #fdd835;
-            color: #0056b3;
-            border: none;
-            cursor: pointer;
-            width: calc(100% - 40px);
-            max-width: 600px;
-            margin-bottom: 20px;
-            margin-top: 40px;
-            position: relative; /* Corrigido para não sobrepor à navegação inferior */
-        }
-        .button-container {
-            text-align: center;
-        }
-        .download-btn:hover {
-            background-color: #fbc02d;
-        }
-    </style>
+    <title>Cadastro de Equipamentos</title>
+    <!-- Link para o arquivo CSS global -->
+    <link rel="stylesheet" href="global.css">
 </head>
 <body>
-    <h2>LISTA DE EQUIPAMENTOS</h2>
+    <div class="header">
+        <h1>CADASTRO DE EQUIPAMENTOS</h1>
+    </div>
+
     <div class="container">
-        <label for="clienteFilter">Filtrar por Cliente:</label>
-        <select id="clienteFilter">
-            <option value="">Todos os Clientes</option>
-            <!-- Clientes cadastrados serão carregados aqui -->
-        </select>
+        <form id="equipamentoForm">
+            <label for="nome_equipamento">Nome do Equipamento</label>
+            <input type="text" id="nome_equipamento" name="nome_equipamento" required>
+
+            <label for="fabricante">Fabricante</label>
+            <input type="text" id="fabricante" name="fabricante" required>
+
+            <label for="modelo">Modelo</label>
+            <input type="text" id="modelo" name="modelo" required>
+
+            <label for="numero_serie">Número de Série</label>
+            <input type="text" id="numero_serie" name="numero_serie" required>
+
+            <label for="cliente">Cliente</label>
+            <select id="cliente" name="cliente" required>
+                <!-- Clientes cadastrados serão carregados aqui -->
+            </select>
+
+            <label for="local_instalacao">Local de Instalação</label>
+            <input type="text" id="local_instalacao" name="local_instalacao" required>
+
+            <button type="submit">Cadastrar Equipamento</button>
+        </form>
 
         <div id="equipamentoListContainer" class="scrollable">
             <table id="equipamentoList">
@@ -132,6 +47,7 @@ border: 1px solid white;
                         <th>Número de Série</th>
                         <th>Cliente</th>
                         <th>Local</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -139,37 +55,24 @@ border: 1px solid white;
         </div>
     </div>
 
- <div class="button-container">
-    <button id="downloadPDF" class="download-btn">Baixar Lista em PDF</button>
-</div>
-
- <div class="bottom-nav">
-        <button class="prev" onclick="window.location.href='almoxarifado.html'">Voltar</button>
+    <div class="bottom-nav">
+        <button class="prev" onclick="window.location.href='cadastrar-serviços.html'">Voltar</button>
         <div class="menu-button">
-            <button onclick="window.location.href='relatorios2.html'">MENU</button>
+            <button onclick="window.location.href='index.html'">MENU</button>
         </div>
-        <button class="next" onclick="window.location.href='index.html'">Avançar</button>
+        <button class="next" onclick="window.location.href='plano-manutenção.html'">Avançar</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        const clienteFilter = document.getElementById('clienteFilter');
+        const equipamentoForm = document.getElementById('equipamentoForm');
         const equipamentoList = document.querySelector('#equipamentoList tbody');
-        const downloadPDFBtn = document.getElementById('downloadPDF');
         let equipamentos = JSON.parse(localStorage.getItem('equipamentos')) || [];
+        let editIndex = null;
 
         // Função para renderizar os equipamentos cadastrados na página
         function renderEquipamentos() {
-            const clienteSelecionado = clienteFilter.value;
             equipamentoList.innerHTML = '';
-
-            // Filtrar equipamentos com base no cliente selecionado
-            const equipamentosFiltrados = clienteSelecionado
-                ? equipamentos.filter(equipamento => equipamento.cliente === clienteSelecionado)
-                : equipamentos;
-
-            // Renderizar os equipamentos filtrados
-            equipamentosFiltrados.forEach((equipamento) => {
+            equipamentos.forEach((equipamento, index) => {
                 equipamentoList.innerHTML += `
                     <tr>
                         <td>${equipamento.nome_equipamento}</td>
@@ -178,42 +81,76 @@ border: 1px solid white;
                         <td>${equipamento.numero_serie}</td>
                         <td>${equipamento.cliente}</td>
                         <td>${equipamento.local_instalacao}</td>
+                        <td>
+                            <div class="dropdown">
+                                <span class="arrow">▼</span>
+                                <div class="dropdown-content">
+                                    <a href="#" class="edit" onclick="editEquipamento(${index})">Editar</a>
+                                    <a href="#" class="delete" onclick="deleteEquipamento(${index})">Apagar</a>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
         }
 
-        // Função para carregar clientes no filtro
-        function carregarClientes() {
-            const clientes = [...new Set(equipamentos.map(equipamento => equipamento.cliente))];
-            clientes.forEach(cliente => {
-                clienteFilter.innerHTML += `<option value="${cliente}">${cliente}</option>`;
-            });
+        // Função para salvar o equipamento no localStorage
+        equipamentoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const equipamentoData = {
+                nome_equipamento: document.getElementById('nome_equipamento').value,
+                fabricante: document.getElementById('fabricante').value,
+                modelo: document.getElementById('modelo').value,
+                numero_serie: document.getElementById('numero_serie').value,
+                cliente: document.getElementById('cliente').value,
+                local_instalacao: document.getElementById('local_instalacao').value
+            };
+
+            if (editIndex === null) {
+                equipamentos.push(equipamentoData);
+            } else {
+                equipamentos[editIndex] = equipamentoData;
+                editIndex = null;
+            }
+
+            localStorage.setItem('equipamentos', JSON.stringify(equipamentos));
+            renderEquipamentos();
+            equipamentoForm.reset();
+        });
+
+        // Função para editar um equipamento
+        function editEquipamento(index) {
+            const equipamento = equipamentos[index];
+            document.getElementById('nome_equipamento').value = equipamento.nome_equipamento;
+            document.getElementById('fabricante').value = equipamento.fabricante;
+            document.getElementById('modelo').value = equipamento.modelo;
+            document.getElementById('numero_serie').value = equipamento.numero_serie;
+            document.getElementById('cliente').value = equipamento.cliente;
+            document.getElementById('local_instalacao').value = equipamento.local_instalacao;
+
+            editIndex = index;
         }
 
-        // Função para gerar PDF
-        function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+        // Função para apagar um equipamento
+        function deleteEquipamento(index) {
+            if (confirm('Tem certeza que deseja apagar este equipamento?')) {
+                equipamentos.splice(index, 1);
+                localStorage.setItem('equipamentos', JSON.stringify(equipamentos));
+                renderEquipamentos();
+            }
+        }
 
-            const clienteSelecionado = clienteFilter.value;
-            const equipamentosFiltrados = clienteSelecionado
-                ? equipamentos.filter(equipamento => equipamento.cliente === clienteSelecionado)
-                : equipamentos;
+        // Função para carregar os clientes do localStorage e preencher o select
+        function carregarClientes() {
+            const clientes = JSON.parse(localStorage.getItem('clientes')) || [];
+            const clienteSelect = document.getElementById('cliente');
 
-            doc.text('Lista de Equipamentos', 10, 10);
-            let linhaInicial = 20;
-
-            equipamentosFiltrados.forEach((equipamento, index) => {
-                doc.text(
-                    `${index + 1}. Nome: ${equipamento.nome_equipamento}, Fabricante: ${equipamento.fabricante}, Modelo: ${equipamento.modelo}, Nº Série: ${equipamento.numero_serie}, Cliente: ${equipamento.cliente}, Local: ${equipamento.local_instalacao}`,
-                    10,
-                    linhaInicial
-                );
-                linhaInicial += 10;
+            clienteSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            clientes.forEach(cliente => {
+                clienteSelect.innerHTML += `<option value="${cliente.nome_cliente}">${cliente.nome_cliente}</option>`;
             });
-
-            doc.save('lista_de_equipamentos.pdf');
         }
 
         // Chamada para carregar clientes e renderizar equipamentos ao carregar a página
@@ -221,12 +158,6 @@ border: 1px solid white;
             carregarClientes();
             renderEquipamentos();
         };
-
-        // Adicionar evento para filtrar equipamentos quando o cliente for selecionado
-        clienteFilter.addEventListener('change', renderEquipamentos);
-
-        // Adicionar evento para gerar PDF
-        downloadPDFBtn.addEventListener('click', gerarPDF);
     </script>
 </body>
 </html>
