@@ -1,0 +1,465 @@
+/* Estilos Gerais */
+
+:root {
+    --logo-width: 150px; /* Largura da logo */
+    --logo-height: auto; /* Altura da logo */
+    --footer-background: #0056b3; /* Cor de fundo do rodapé */
+    --footer-text-color: white; /* Cor do texto do rodapé */
+    --footer-padding: 20px; /* Espaçamento interno do rodapé */
+    --footer-font-size: 14px; /* Tamanho da fonte do rodapé */
+}
+
+/* Ajuste para a logo */
+.logo {
+    width: var(--logo-width);
+    height: var(--logo-height);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
+/* Estilos para o Rodapé */
+.footer {
+    background-color: var(--footer-background);
+    color: var(--footer-text-color);
+    padding: var(--footer-padding);
+    text-align: center;
+    font-size: var(--footer-font-size);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+        /* Estilos para a logo */
+        .logo-header {
+            position: absolute;
+            top: 8px;
+            left: -6px;
+            width: var(--logo-width, 100px);
+            height: var(--logo-height, auto);
+        }
+
+        .logo-header img {
+            width: 50%;
+            height: auto;
+        }
+
+   
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #0056b3; /* Azul */
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+h2 {
+    text-align: center;
+    color: #0056b3;
+    font-size: 24px;
+    margin-bottom: 20px;
+    line-height: 1.5; /* Define a altura da linha para o título */
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background-color: #fff;
+    color: #0056b3;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    margin-top: calc(1 * 1.5 * 24px); /* 3 linhas * line-height * font-size */
+}
+
+input, select, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #fdd835; /* Amarelo */
+    color: #0056b3;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #fbc02d; /* Amarelo mais escuro */
+}
+
+.message {
+    text-align: center;
+    margin-top: 10px;
+    color: red;
+    font-size: 14px;
+}
+
+/* Estilos para Tabelas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #0056b3;
+    color: white;
+}
+
+/* Estilos para Botões de Ação */
+.action-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    margin-right: 5px;
+    background-color: #ff7043; /* Laranja */
+    color: #0056b3;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.action-btn.edit {
+    background-color: #2196F3; /* Azul claro */
+}
+
+.action-btn.delete {
+    background-color: #f44336; /* Vermelho */
+}
+
+/* Estilos para Scrollable */
+.scrollable {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* Estilos para Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #0056b3;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-nav button {
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #fdd835;
+    color: #0056b3;
+    border: none;
+    cursor: pointer;
+    max-width: 150px;
+    margin: 0 15px;
+}
+
+.bottom-nav button:hover {
+    background-color: #fbc02d;
+}
+
+.prev, .next {
+    flex-grow: 1;
+    text-align: center;
+    max-width: 150px;
+}
+
+.menu-button {
+    flex-grow: 2;
+    text-align: center;
+}
+
+.menu-button button {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+}
+
+/* Estilos para Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    min-width: 160px;
+    z-index: 1;
+    border-radius: 5px;
+    right: 100%; /* Expande para a esquerda */
+    top: 0;
+}
+
+.dropdown-content button {
+    color: #0056b3;
+    background-color: #ffffff;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dropdown-content button:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Estilos para Formulários */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form input:not(:last-child), form select:not(:last-child), form textarea:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+form button {
+    margin-top: 10px;
+}
+
+/* Estilos para o checklist */
+.checklist {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.checklist label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.status-options {
+    display: flex;
+    gap: 10px;
+}
+
+.status-options label {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para Links Adicionais */
+.link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.link a {
+    color: #0056b3;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link a:hover {
+    text-decoration: underline;
+}
+
+/* Estilos do Cabeçalho */
+.header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #0056b3;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.header h1 {
+    color: white;
+    font-size: 22px;
+    margin: 1;
+}
+
+/* Estilo para o elemento #data-hora */
+#data-hora {
+    color: white;
+    font-size: 16px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* Estilos para Botão de Dropdown */
+.dropbtn {
+    background-color: #fdd835;
+    color: #0056b3;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.dropdown-content a {
+    color: #0056b3;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #fdd835;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #fbc02d;
+}
+
+/* Estilos para Orçamentos */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.arrow {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.dropdown-content a.approve {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.dropdown-content a.edit {
+    background-color: #fdd835;
+    color: #0056b3;
+}
+
+.dropdown-content a.delete {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.dropdown-content a:hover.approve {
+    background-color: #45a049;
+}
+
+.dropdown-content a:hover.edit {
+    background-color: #e1c31d;
+}
+
+.dropdown-content a:hover.delete {
+    background-color: #e60000;
+}
+
+.dropdownid {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.dropbtnid {
+    background-color: #fdd835;
+    color: #0056b3;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.dropdownid-content {
+    display: none;
+    position: absolute;
+    right: 100%; /* Posiciona o menu à esquerda do botão */
+    top: 0; /* Alinha o topo do menu com o topo do botão */
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.dropdownid-content a {
+    color: #0056b3;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdownid-content a:hover {
+    background-color: #fdd835;
+}
+
+.dropdownid:hover .dropdownid-content {
+    display: block;
+}
+
+.dropdownid:hover .dropbtnid {
+    background-color: #fbc02d;
+}
+       /* Botão de fechar */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: blue;
+        }
+
+        .close-btn:hover {
+            color: #007BFF;
+        }
