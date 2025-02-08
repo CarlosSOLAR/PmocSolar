@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Logo e Rodapé</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        /* Estilos para o editor */
+        .editor-container {
+            max-width: 350px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .editor-container h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        .editor-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .editor-container input,
+        .editor-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .editor-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .editor-container button:hover {
+            background-color: #004494;
+        }
+
+        /* Estilos para a pré-visualização */
+        .preview {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .preview h3 {
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        .preview .logo {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .preview .footer {
+            background-color: var(--footer-background, #0056b3);
+            color: var(--footer-text-color, white);
+            padding: var(--footer-padding, 20px);
+            text-align: center;
+            font-size: var(--footer-font-size, 14px);
+        }
+
+        .logo img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Mensagens e endereço da imagem */
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+
+        .image-url {
+            word-wrap: break-word;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="editor-container">
+  
+    <!-- Botão de fechar -->
+    <span class="close-btn" onclick="closePage()">&times;</span> 
+  
+    <h2>Editor de Logo e Rodapé</h2>
+
+    <form id="editorForm">
+        <label for="logoFile">Carregar Logo:</label>
+        <input type="file" id="logoFile" accept="image/*" onchange="handleLogoUpload()">
+        <p id="uploadMessage" class="message"></p>
+        
+
+        <div class="preview">
+            <h3>Pré-visualização da Logo</h3>
+            <div class="logo">
+                <img id="logoPreview" alt="Logo">
+            </div>
+        </div>
+
+        <label for="logoWidth">Largura da Logo:</label>
+        <input type="text" id="logoWidth" placeholder="Ex: 150px">
+
+        <label for="logoHeight">Altura da Logo:</label>
+        <input type="text" id="logoHeight" placeholder="Ex: auto">
+
+        <label for="footerBackground">Cor de Fundo do Rodapé:</label>
+        <input type="text" id="footerBackground" placeholder="Ex: #0056b3">
+
+        <label for="footerTextColor">Cor do Texto do Rodapé:</label>
+        <input type="text" id="footerTextColor" placeholder="Ex: white">
+
+        <label for="footerPadding">Espaçamento Interno do Rodapé:</label>
+        <input type="text" id="footerPadding" placeholder="Ex: 20px">
+
+        <label for="footerFontSize">Tamanho da Fonte do Rodapé:</label>
+        <input type="text" id="footerFontSize" placeholder="Ex: 14px">
+
+        <label for="footerText">Texto do Rodapé:</label>
+        <textarea id="footerText" placeholder="Ex: &copy; 2025 Sua Empresa. Todos os direitos reservados."></textarea>
+
+        <button type="button" onclick="updateVariables()">Atualizar Variáveis</button>
+    </form>
+
+            <p id="footerPreviewText">&copy; 2025 Sua Empresa. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleLogoUpload() {
+        const fileInput = document.getElementById('logoFile');
+        const file = fileInput.files[0];
+        const uploadMessage = document.getElementById('uploadMessage');
+        const imageUrlElement = document.getElementById('imageUrl');
+        const logoPreview = document.getElementById('logoPreview');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imageUrl = e.target.result;
+
+                if (!imageUrl.startsWith('data:image/')) {
+                    uploadMessage.innerText = 'Formato de imagem não suportado.';
+                    uploadMessage.classList.add('error');
+                    return;
+                }
+
+                localStorage.setItem('logoUrl', imageUrl);
+                logoPreview.src = imageUrl;
+                uploadMessage.innerText = 'Imagem carregada com sucesso!';
+                uploadMessage.classList.remove('error');
+                imageUrlElement.innerText = `Endereço da imagem: ${imageUrl.substring(0, 100)}...`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            uploadMessage.innerText = 'Nenhuma imagem selecionada.';
+            uploadMessage.classList.add('error');
+        }
+    }
+
+    function updateVariables() {
+        const logoWidth = document.getElementById('logoWidth').value;
+        const logoHeight = document.getElementById('logoHeight').value;
+        const footerBackground = document.getElementById('footerBackground').value;
+        const footerTextColor = document.getElementById('footerTextColor').value;
+        const footerPadding = document.getElementById('footerPadding').value;
+        const footerFontSize = document.getElementById('footerFontSize').value;
+        const footerText = document.getElementById('footerText').value;
+
+        localStorage.setItem('footerText', footerText);
+        document.getElementById('footerPreviewText').innerText = footerText || '&copy; 2025 Sua Empresa. Todos os direitos reservados.';
+    }
+
+ // Função para fechar a página e redirecionar para index.html
+    function closePage() {
+        window.location.href = 'index.html';
+    }
+
+    window.onload = function () {
+        const logoUrl = localStorage.getItem('logoUrl');
+        if (logoUrl) {
+            document.getElementById('logoPreview').src = logoUrl;
+            document.getElementById('imageUrl').innerText = `Endereço da imagem: ${logoUrl.substring(0, 100)}...`;
+        }
+    };
+</script>
+
+</body>
+</html>
