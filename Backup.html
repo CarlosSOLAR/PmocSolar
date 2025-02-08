@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup e Restauração de Dados</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .container h2 {
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .container button:hover {
+            background-color: #004494;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+  
+    <span class="close-btn" onclick="closePage()">&times;</span>
+  
+    <h2>Backup e Restauração de Dados</h2>
+
+    <!-- Botão para criar backup -->
+    <button onclick="createBackup()">Criar Backup</button>
+
+    <!-- Botão para restaurar backup -->
+    <button onclick="restoreBackup()">Restaurar Backup</button>
+
+    <!-- Mensagem de confirmação -->
+    <p id="message" class="message"></p>
+</div>
+
+<script>
+   // Função para fechar a página e redirecionar para index.html
+    function closePage() {
+        window.location.href = 'index.html';
+    }
+  
+    // Função para criar um backup dos dados do localStorage
+    function createBackup() {
+        const backup = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            backup[key] = localStorage.getItem(key);
+        }
+        // Salva o backup no localStorage
+        localStorage.setItem('backup', JSON.stringify(backup));
+        showMessage('Backup criado com sucesso!', 'success');
+    }
+
+    // Função para restaurar os dados do backup
+    function restoreBackup() {
+        const backup = JSON.parse(localStorage.getItem('backup'));
+        if (backup) {
+            // Limpa o localStorage atual
+            localStorage.clear();
+            // Restaura os dados do backup
+            for (const key in backup) {
+                localStorage.setItem(key, backup[key]);
+            }
+            showMessage('Backup restaurado com sucesso!', 'success');
+        } else {
+            showMessage('Nenhum backup encontrado.', 'error');
+        }
+    }
+
+    // Função para exibir mensagens
+    function showMessage(msg, type = "success") {
+        const messageElement = document.getElementById('message');
+        messageElement.innerText = msg;
+        messageElement.className = `message ${type}`;
+        setTimeout(() => {
+            messageElement.innerText = '';
+            messageElement.className = 'message';
+        }, 3000);
+    }
+</script>
+</body>
+</html>
