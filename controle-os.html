@@ -6,155 +6,16 @@
     <title>Ordem de Serviço</title>
     <!-- Inclua a biblioteca jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0056b3; /* Azul */
-            padding: 20px;
-            color: white; /* Cor do texto branco para contraste */
-        }
-        h2 {
-            text-align: center;
-            color: white;
-            font-size: 24px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            color: #0056b3;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        input, select, textarea, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #fdd835;
-            color: #0056b3;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #fbc02d;
-        }
-        .os-number {
-            font-weight: bold;
-            font-size: 18px;
-            padding: 10px;
-            color: #0056b3;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: block;
-            width: fit-content;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #0056b3;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .bottom-nav button {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            background-color: #fdd835;
-            color: #0056b3;
-            border: none;
-            cursor: pointer;
-            max-width: 150px;
-            margin: 0 15px;
-        }
-        .prev, .next {
-            flex-grow: 1;
-            text-align: center;
-            max-width: 150px;
-        }
-        .menu-button {
-            flex-grow: 2;
-            text-align: center;
-        }
-        .menu-button button {
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-        .scrollable {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 8px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        th {
-            background-color: #0056b3;
-            color: white;
-        }
-        .os-actions {
-            position: relative;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropbtn {
-            background-color: #fdd835;
-            color: #0056b3;
-            padding: 5px 10px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #ffffff;
-            min-width: 100px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            border-radius: 5px;
-        }
-        .dropdown-content button {
-            color: #0056b3;
-            background-color: #ffffff;
-            padding: 10px;
-            width: 100%;
-            border: none;
-            text-align: left;
-            cursor: pointer;
-        }
-        .dropdown-content button:hover {
-            background-color: #f0f0f0;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-    </style>
+    <!-- Link para o arquivo CSS global -->
+    <link rel="stylesheet" href="global.css">
 </head>
 <body>
-    <h2>ORDEM DE SERVIÇO</h2>
-    <form id="osForm">
-        <div class="container">
+    <div class="header">
+        <h1>ORDEM DE SERVIÇO</h1>
+    </div>
+
+    <div class="container">
+        <form id="osForm">
             <label for="os_numero">N° da OS</label>
             <span id="os_numero" class="os-number"></span>
 
@@ -189,22 +50,24 @@
             </select>
 
             <button type="submit">Cadastrar Ordem de Serviço</button>
- 
+        </form>
 
-    <div class="scrollable">
-        <table id="osList">
-            <thead>
-                <tr>
-                    <th>N° OS</th>
-                    <th>Cliente</th>
-                    <th>Equipamento</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- As ordens de serviço serão renderizadas aqui -->
-            </tbody>
-        </table>
+        <div class="scrollable">
+            <table id="osList">
+                <thead>
+                    <tr>
+                        <th>data_inicial</th>
+                        <th>N° OS</th>
+                        <th>Cliente</th>
+                        <th>Equipamento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- As ordens de serviço serão renderizadas aqui -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="bottom-nav">
@@ -237,7 +100,7 @@
                 data_inicial: document.getElementById('data_inicial').value,
                 data_conclusao: document.getElementById('data_conclusao').value,
                 tipo_servico: document.getElementById('tipo_servico').value,
-  equipamento: document.getElementById('equipamento').value,
+                equipamento: document.getElementById('equipamento').value,
                 cliente: document.getElementById('cliente').value,
                 descricao_problema: document.getElementById('descricao_problema').value,
                 metodo_correcao: document.getElementById('metodo_correcao').value,
@@ -262,17 +125,17 @@
             osList.querySelector('tbody').innerHTML = '';
             ordens.forEach((ordem, index) => {
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${ordem.os_numero}</td>
-                    <td>${ordem.cliente}</td>
-                    <td>${ordem.equipamento}</td>
+                row.innerHTML = `               <td>${ordem.data_inicial}</td>
+                  <td>${ordem.os_numero}</td>
+                  <td>${ordem.cliente}</td>
+                  <td>${ordem.equipamento}</td>
                     <td>
                         <div class="dropdown">
-                            <button class="dropbtn">Ações</button>
+                            <span class="arrow">▼</span>
                             <div class="dropdown-content">
-                                <button onclick="editOrdem(${index})">Editar</button>
-                                <button onclick="deleteOrdem(${index})">Excluir</button>
-                                <button onclick="generatePDF(${index})">Baixar PDF</button>
+                                <a href="#" class="edit" onclick="editOrdem(${index})">Editar</a>
+                                <a href="#" class="delete" onclick="deleteOrdem(${index})">Excluir</a>
+                                <a href="#" class="download" onclick="generatePDF(${index})">Baixar PDF</a>
                             </div>
                         </div>
                     </td>
