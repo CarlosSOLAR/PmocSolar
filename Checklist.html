@@ -4,120 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHECKLISTS</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0056b3;
-            padding: 20px;
-            color: white;
-        }
-        h2 {
-            text-align: center;
-            color: white;
-            font-size: 24px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            color: #0056b3;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        input, select, textarea, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-              border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #fdd835;
-            color: #0056b3;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #fbc02d;
-        }
-        .scrollable {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-         th {
-           background-color: #0056b3;
-            color: white;
-         }
-        .checklist {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .checklist label {
-            margin-right: 10px;
-        }
-        .status-options {
-            display: flex;
-            justify-content: space-around;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #0056b3; /* Mesma cor de fundo azul */
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .bottom-nav button {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            background-color: #fdd835; /* Fundo amarelo */
-            color: #0056b3; /* Texto azul escuro */
-            border: none;
-            cursor: pointer;
-            width: 150px; /* Ajuste na largura dos botões */
-            margin: 0 15px; /* Espaçamento horizontal entre os botões */
-        }
-        .bottom-nav button:hover {
-            background-color: #fbc02d; /* Amarelo mais escuro no hover */
-        }
-        .prev, .next {
-            text-align: center;
-        }
-        .menu-button {
-            text-align: center;
-            flex-grow: 2;
-        }
-        .menu-button button {
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-        }
-    </style>
+    <!-- Link para o arquivo CSS global -->
+    <link rel="stylesheet" href="global.css">
 </head>
 <body>
-    <h2>CHECKLISTS</h2>
+    <div class="header">
+        <h1>CHECKLISTS</h1>
+    </div>
+
     <div class="container">
         <form id="checklistForm">
             <!-- Data de Preenchimento -->
@@ -138,30 +32,31 @@
             <div id="servicosChecklist" class="scrollable">
                 <!-- Serviços e opções do checklist serão gerados aqui -->
             </div>
+
             <label for="observacoes">Observações</label>
             <textarea id="observacoes" name="observacoes" required></textarea>
 
             <button type="submit">Salvar Checklist</button>
         </form>
-    
 
-    <div class="scrollable">
-        <table id="checklistList">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Cliente</th>
-                    <th>Equipamento</th>
-                    <th>Serviço</th>
-                    <th>Status</th>
-                    <th>Frequência</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="scrollable">
+            <table id="checklistList">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Equipamento</th>
+                        <th>Serviço</th>
+                        <th>Status</th>
+                        <th>Frequência</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
-</div>
+
     <div class="bottom-nav">
         <button class="prev" onclick="window.location.href='controle-os.html'">Voltar</button>
         <div class="menu-button">
@@ -169,6 +64,7 @@
         </div>
         <button class="next" onclick="window.location.href='orçamento.html'">Avançar</button>
     </div>
+
     <script>
         const checklistForm = document.getElementById('checklistForm');
         const servicosChecklist = document.getElementById('servicosChecklist');
@@ -230,8 +126,7 @@
                 }
             });
 
-
-// Agrupa os checklists por cliente e equipamento
+            // Agrupa os checklists por cliente e equipamento
             const existingChecklistIndex = checklists.findIndex(checklist => 
                 checklist.cliente === checklistData.cliente && 
                 checklist.equipamento === checklistData.equipamento && 
@@ -247,7 +142,7 @@
                 checklists.push(checklistData);
             }
 
-          // Salva no localStorage
+            // Salva no localStorage
             localStorage.setItem('checklists', JSON.stringify(checklists));
             checklistForm.reset();
             gerarDataPreenchimento(); // Gera uma nova data para o próximo preenchimento
@@ -288,8 +183,14 @@
                             <td>${servico.status}</td>
                             <td>${servico.frequencia}</td>
                             <td>
-                                <button onclick="editarChecklist(${index})">Editar</button>
-                                <button onclick="deletarChecklist(${index})">Deletar</button>
+                                <div class="dropdown">
+                                    <span class="arrow">▼</span>
+                                    <div class="dropdown-content">
+                                        <a href="#" class="edit" onclick="editarChecklist(${index})">Editar</a>
+                                        <a href="#" class="delete" onclick="deletarChecklist(${index})">Deletar</a>
+                                        <a href="#" class="download" onclick="generatePDF(${index})">Baixar PDF</a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -322,6 +223,12 @@
             checklists.splice(index, 1); // Remove o checklist da lista
             localStorage.setItem('checklists', JSON.stringify(checklists)); // Atualiza o localStorage
             renderizarChecklists(); // Re-renderiza a tabela com os checklists atualizados
+        }
+
+        // Função para gerar PDF (simulação)
+        function generatePDF(index) {
+            alert(`Gerando PDF para o checklist ${index}`);
+            // Implemente a lógica de geração de PDF aqui
         }
 
         // Chamada para carregar equipamentos, clientes e serviços ao carregar a página
