@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Empresa</title>
+    <!-- Link para o arquivo CSS global -->
+    <link rel="stylesheet" href="global.css">
+    <style>
+        /* Estilos específicos para o formulário de cadastro de empresa */
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+
+        .container label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .container input,
+        .container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .container button:hover {
+            background-color: #004494;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            color: green;
+        }
+
+        .message.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+      
+        <span class="close-btn" onclick="closePage()">&times;</span>
+      
+        <h2>Cadastro de Empresa</h2>
+        <form id="empresaForm">
+            <label for="nome">Nome da Empresa:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="cnpj">CNPJ:</label>
+            <input type="text" id="cnpj" name="cnpj" required>
+
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" required>
+
+            <label for="telefone">Telefone:</label>
+            <input type="text" id="telefone" name="telefone" required>
+
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+
+            <button type="submit">Salvar Dados</button>
+        </form>
+        <p id="message" class="message"></p>
+    </div>
+
+    <script>
+        // Função para salvar os dados da empresa no localStorage
+        function saveEmpresa(e) {
+            e.preventDefault();
+
+            const empresa = {
+                nome: document.getElementById('nome').value,
+                cnpj: document.getElementById('cnpj').value,
+                endereco: document.getElementById('endereco').value,
+                telefone: document.getElementById('telefone').value,
+                email: document.getElementById('email').value
+            };
+
+            localStorage.setItem('empresa', JSON.stringify(empresa));
+            showMessage('Dados da empresa salvos com sucesso!', 'success');
+        }
+
+        // Função para exibir mensagens
+        function showMessage(msg, type = "success") {
+            const messageElement = document.getElementById('message');
+            messageElement.innerText = msg;
+            messageElement.className = `message ${type}`;
+            setTimeout(() => {
+                messageElement.innerText = '';
+                messageElement.className = 'message';
+            }, 3000);
+        }
+
+   // Função para fechar a página e redirecionar para index.html
+    function closePage() {
+        window.location.href = 'index.html';
+    }
+
+        // Carrega os dados da empresa ao abrir a página
+        window.onload = function () {
+            const empresa = JSON.parse(localStorage.getItem('empresa')) || {};
+            document.getElementById('nome').value = empresa.nome || '';
+            document.getElementById('cnpj').value = empresa.cnpj || '';
+            document.getElementById('endereco').value = empresa.endereco || '';
+            document.getElementById('telefone').value = empresa.telefone || '';
+            document.getElementById('email').value = empresa.email || '';
+        };
+
+        // Adiciona o evento de submit ao formulário
+        document.getElementById('empresaForm').addEventListener('submit', saveEmpresa);
+    </script>
+</body>
+</html>
